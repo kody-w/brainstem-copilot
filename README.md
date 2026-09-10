@@ -1,7 +1,7 @@
-# Brainstem for the GitHub Copilot app
+# Brainstem Copilot
 
-**Your Brainstem and Brain Surgeon are native Copilot agents. No Brainstem
-server required.**
+**Brain Surgeon leads the main Copilot loop, building and using a Copilot-based
+Brainstem. No Brainstem server required.**
 
 Keep the Brainstem way of working: a soul, explicit memory, useful capabilities,
 and a visible **Learn -> Teach -> Keep** loop. GitHub Copilot supplies the
@@ -16,26 +16,44 @@ that engine.
 
 1. Open **Customize -> Plugins** in the GitHub Copilot app.
 2. Open marketplace settings and add
-   **`kody-w/rapp-brainstem-copilot-app`**.
-3. Install **Brainstem** from the **brainstem** marketplace.
-4. Start a new session, choose the **Brainstem** agent, and say:
+   **`kody-w/brainstem-copilot`**.
+3. Install **brainstem-copilot** from the **brainstem-copilot** marketplace.
+4. Start a new session, choose this plugin's **Brain Surgeon** agent, and say:
 
    > Give me my Brainstem.
 
-Brainstem handles everyday work. Choose **Brain Surgeon**, or ask to teach a
-capability, when you want to turn a useful procedure into a reusable skill.
+Brain Surgeon is the primary conversation and teaching loop. It builds and
+uses **Brainstem**, a native Copilot agent with your soul, approved memory,
+and learned capabilities. Native delegation is available when useful; simple
+work does not need a second agent. You can also choose Brainstem directly.
 The app's normal approvals still apply. Organization policy may restrict
 custom plugins or extensions.
 
 This repository is its own custom marketplace. Installation does not depend
 on placement in GitHub's featured or editor-curated catalog.
 
+For CLI users, the same package can also be installed directly:
+
+```sh
+copilot plugin install kody-w/brainstem-copilot
+```
+
+The CLI currently gates extension tools behind experimental features. To use
+the profile/workbench tools there, start with:
+
+```sh
+copilot --experimental --agent brainstem-copilot:brain-surgeon
+```
+
+The app's agent picker handles the qualified agent ID for you. The bundled
+agents and skills remain usable in chat when extension tools are unavailable.
+
 ## The same shape, native building blocks
 
 | Familiar word | What it means here |
 |---|---|
-| **Brainstem** | Your everyday native Copilot agent |
-| **Brain Surgeon** | The native Copilot agent that teaches or improves a capability |
+| **Brainstem** | The Copilot-based agent carrying and using your learned capabilities |
+| **Brain Surgeon** | The main Copilot conversation, building and improving your Brainstem |
 | **Soul** | Your editable working instructions |
 | **Memory** | Explicitly approved local notes, separate from Copilot's own Memory |
 | **Capability** | An ordinary Copilot skill, custom agent, or tool |
@@ -43,16 +61,17 @@ on placement in GitHub's featured or editor-curated catalog.
 | **Frontier** | Opt into a separate RAPP Brainstem engine when you need it |
 
 ```text
-Soul + approved notes + relevant capabilities
-                    |
-             Native Copilot agent
-                    |
-             Native Copilot tools
-                    |
-          Visible actions and results
+Brain Surgeon (main Copilot loop)
+              |
+Brainstem (native Copilot agent)
+  soul + approved notes + capabilities
+              |
+       Native Copilot tools
+              |
+    Visible actions and results
 ```
 
-There is no hidden second model loop. Canvas buttons send user intent back
+There is no separate model service or external orchestration loop. Canvas buttons send user intent back
 into the current Copilot session rather than executing native tasks in a
 separate backend.
 
@@ -72,6 +91,13 @@ capabilities and explains their actual scope.
 
 The Canvas is a view, not a requirement for native agent work. If the client
 does not support Canvas extensions, use the bundled agents and skills in chat.
+
+The app's Canvas API is experimental and renders a URL. While a panel is open,
+the extension supplies its HTML through a short-lived, authenticated loopback
+view, following the app's supported Canvas pattern. The app owns the extension
+process; closing the panel closes its view. This is display/session plumbing,
+not a Brainstem agent server, installer, background daemon, or second model
+loop. Chat-only use starts no HTTP listener and requires no port configuration.
 
 ## Teach something you keep
 
@@ -137,6 +163,10 @@ POSIX systems; Windows uses the local user's inherited ACLs. Do not save
 secrets, sensitive personal information, or third-party confidential content
 in the soul, notes, or a skill you intend to publish.
 
+`COPILOT_HOME` is respected when the host uses a non-default configuration
+directory. Canvas connection keys are ephemeral and are never included in
+the published source or the saved profile.
+
 This is not a sandbox or a replacement for Copilot permissions. Native tools
 retain their normal approval flow. Installed skills and Frontier Python
 agents must be trusted before executing their instructions or code.
@@ -157,6 +187,21 @@ The tests cover the native default, explicit Frontier boundary, source and
 profile handling, real loopback HTTP transport against fixtures, and browser
 interactions.
 
+To exercise the package through an authenticated Copilot host without
+installing it globally or starting a Brainstem engine:
+
+```sh
+copilot --experimental --plugin-dir . \
+  --agent brainstem-copilot:brain-surgeon \
+  --allow-tool 'custom-tool(brainstem_context)' \
+  -p 'Use brainstem_context once. Report the native mode and available skill sources. Do not enable Frontier or change any files.'
+```
+
+Native extension permissions use the `custom-tool(name)` pattern. A bare
+`--allow-tool brainstem_context` is not equivalent and can leave a headless
+session waiting for approval. Do not replace narrow grants with blanket
+permission bypasses.
+
 ```sh
 npm run preview
 ```
@@ -171,6 +216,8 @@ for the Copilot app host.
 - [Customizing the GitHub Copilot app](https://docs.github.com/en/copilot/how-tos/github-copilot-app/customize-github-copilot-app)
 - [Working with Canvas extensions](https://docs.github.com/en/copilot/how-tos/github-copilot-app/working-with-canvas-extensions)
 - [About agent skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
+- [Copilot extension authoring](https://github.com/github/copilot-sdk/blob/main/nodejs/docs/extensions.md)
+- [Plugin manifest reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference)
 
-MIT licensed. This is an independent integration, not an official GitHub
+MIT licensed. Brainstem Copilot is an independent integration, not an official GitHub
 product or a change to the RAPP Grail kernel.

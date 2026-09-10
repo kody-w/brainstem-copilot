@@ -1,5 +1,5 @@
 {
-  "name": "rapp-brainstem-copilot-app",
+  "name": "brainstem-copilot",
   "version": "0.1.0",
   "private": true,
   "description": "Native Copilot Brainstem and Brain Surgeon agents, with a shared workbench and optional Frontier engine.",
@@ -18,6 +18,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kody-w/rapp-brainstem-copilot-app.git"
+    "url": "https://github.com/kody-w/brainstem-copilot.git"
   }
 }

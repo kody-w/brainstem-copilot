@@ -1,0 +1,13 @@
+{
+  "name": "brainstem-copilot",
+  "version": "0.1.0",
+  "description": "Native Copilot Brainstem and Brain Surgeon agents. Learn, teach, and keep capabilities without a Brainstem server. Frontier is optional.",
+  "author": {
+    "name": "RAPP Brainstem contributors"
+  },
+  "repository": "https://github.com/kody-w/brainstem-copilot",
+  "license": "MIT",
+  "agents": "agents",
+  "skills": "skills",
+  "extensions": "extensions"
+}

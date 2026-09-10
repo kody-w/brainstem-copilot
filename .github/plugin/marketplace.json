@@ -1,0 +1,17 @@
+{
+  "name": "brainstem-copilot",
+  "owner": {
+    "name": "kody-w"
+  },
+  "metadata": {
+    "description": "The native Copilot Brainstem experience, with optional Frontier engine support."
+  },
+  "plugins": [
+    {
+      "name": "brainstem-copilot",
+      "description": "Your Brainstem and Brain Surgeon are native Copilot agents. No Brainstem server required.",
+      "version": "0.1.0",
+      "source": "./"
+    }
+  ]
+}
