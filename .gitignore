@@ -1,0 +1,14 @@
+node_modules/
+test-results/
+playwright-report/
+coverage/
+.env
+.env.*
+!.env.example
+.copilot/
+.brainstem_data/
+.copilot_token
+.copilot_session
+.brainstem_secret
+*.log
+.DS_Store

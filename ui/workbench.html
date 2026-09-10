@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brainstem for GitHub Copilot</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme = ["light", "dark"].includes(param) ? param :
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px; background: var(--cp-bg); color: var(--cp-text);
+      font: 14px/1.55 "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    main { max-width: 920px; margin: 0 auto; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 32px; line-height: 1.15; font-weight: 650; letter-spacing: -1px; }
+    h2 { font-size: 17px; font-weight: 650; }
+    h3 { font-size: 13px; font-weight: 650; }
+    button, input, textarea, select { font: inherit; }
+    button, .button-link {
+      min-height: 40px; padding: 8px 16px; border: 1px solid var(--cp-border); border-radius: 0.625rem;
+      background: var(--cp-surface); color: var(--cp-text); font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+    }
+    button:hover, .button-link:hover { border-color: var(--cp-border-strong); background: var(--cp-surface-soft); }
+    button.primary { background: var(--cp-accent); border-color: var(--cp-accent); color: var(--cp-accent-fg); }
+    button.primary:hover { background: var(--cp-accent-hover); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    :focus-visible { outline: 3px solid var(--cp-link); outline-offset: 3px; }
+    input, textarea, select {
+      border: 1px solid var(--cp-border); border-radius: 0.625rem; background: var(--cp-bg-elevated);
+      color: var(--cp-text); padding: 10px 12px; width: 100%; min-width: 0;
+    }
+    textarea { resize: vertical; min-height: 92px; }
+    textarea::placeholder, input::placeholder { color: var(--cp-text-soft); }
+    label { display: block; font-size: 12px; font-weight: 600; color: var(--cp-text-muted); margin-bottom: 8px; }
+    .eyebrow { color: var(--cp-accent); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+    .muted { color: var(--cp-text-muted); }
+    .small { font-size: 12px; }
+    .lead { margin-top: 12px; max-width: 560px; color: var(--cp-text-muted); }
+    .topline { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+    .status { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; white-space: nowrap; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cp-border-strong); flex-shrink: 0; }
+    .dot.ready { background: var(--cp-success); }
+    .dot.warning { background: var(--cp-warning); }
+    .flow { display: flex; align-items: center; gap: 8px; margin: 24px 0; flex-wrap: wrap; }
+    .flow span { background: var(--cp-accent-soft); color: var(--cp-accent); padding: 4px 12px; border-radius: 0.625rem; font-size: 12px; font-weight: 600; }
+    .flow i { color: var(--cp-text-soft); font-style: normal; }
+    .card { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 20px; min-width: 0; }
+    .card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .stack { display: grid; gap: 16px; }
+    .columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+    .actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    .actions.end { justify-content: flex-end; }
+    .inline-field { display: flex; align-items: stretch; gap: 8px; }
+    .inline-field input, .inline-field select { flex: 1; }
+    .inline-field button { flex-shrink: 0; }
+    .connection { margin-bottom: 16px; }
+    .connection summary { color: var(--cp-text-muted); font-size: 12px; cursor: pointer; padding: 4px 0; }
+    .connection form { padding-top: 16px; }
+    .meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; font-size: 12px; color: var(--cp-text-muted); }
+    .meta span { overflow-wrap: anywhere; }
+    .pill { border: 1px solid var(--cp-border); border-radius: 0.625rem; padding: 2px 8px; font-size: 11px; color: var(--cp-text-muted); }
+    .capabilities { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; }
+    .capabilities li { padding: 6px 10px; background: var(--cp-surface-soft); border-radius: 0.625rem; overflow-wrap: anywhere; font-size: 12px; }
+    .empty { border: 1px dashed var(--cp-border); padding: 20px; border-radius: 0.625rem; color: var(--cp-text-muted); }
+    .empty p + p { margin-top: 4px; }
+    .error, .notice { padding: 12px 16px; border: 1px solid var(--cp-border); border-left: 3px solid var(--cp-danger); background: var(--cp-surface); border-radius: 0.625rem; overflow-wrap: anywhere; margin-bottom: 16px; }
+    .error { color: var(--cp-danger); }
+    .notice { border-left-color: var(--cp-accent); color: var(--cp-text-muted); font-size: 12px; }
+    [hidden] { display: none !important; }
+    pre, code { font-family: Consolas, "Courier New", Courier, monospace; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--cp-bg-elevated); border: 1px solid var(--cp-border); padding: 12px; border-radius: 0.625rem; font-size: 12px; line-height: 1.65; margin: 8px 0 0; max-height: 400px; overflow-y: auto; }
+    .source { margin-top: 16px; }
+    .source pre { white-space: pre; overflow-x: auto; }
+    .runs { display: grid; gap: 12px; }
+    .run { border: 1px solid var(--cp-border); border-radius: 0.625rem; padding: 12px; }
+    .run summary { cursor: pointer; display: flex; align-items: center; gap: 12px; }
+    .run-prompt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+    .run-status { color: var(--cp-text-muted); font-size: 11px; }
+    .run-status.done { color: var(--cp-success); }
+    .run-status.error { color: var(--cp-danger); border: 0; background: var(--cp-surface); padding: 0; margin: 0; }
+    .run-status.unknown { color: var(--cp-warning); }
+    .run-body { margin-top: 12px; }
+    .run-body h3 { margin-top: 12px; }
+    .run-body p { white-space: pre-wrap; overflow-wrap: anywhere; }
+    footer { margin: 20px 0 4px; color: var(--cp-text-muted); font-size: 11px; line-height: 1.7; }
+    dialog { width: min(480px, calc(100vw - 32px)); border: 1px solid var(--cp-border); border-radius: 16px; padding: 24px; background: var(--cp-surface); color: var(--cp-text); }
+    dialog::backdrop { background: var(--cp-overlay); }
+    dialog p { margin-top: 12px; }
+    @media (max-width: 640px) {
+      body { padding: 16px; }
+      .columns { grid-template-columns: minmax(0, 1fr); }
+      h1 { font-size: 28px; }
+      .card { padding: 16px; }
+    }
+    @media (max-width: 380px) {
+      body { padding: 12px; }
+      .topline { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .inline-field { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div id="preview-notice" class="notice" hidden>Interactive preview. Sample data only; no real agent actions or account access.</div>
+    <header>
+      <div class="topline">
+        <span class="eyebrow">Brainstem</span>
+        <span class="status" role="status"><span class="dot ready" id="status-dot"></span><span id="status-text">Native Copilot</span></span>
+      </div>
+      <h1>Your AI. Your capabilities.</h1>
+      <p class="lead">Your Brainstem and Brain Surgeon are Copilot agents. Learn together in chat, teach a capability, and keep the source. Nothing else to run.</p>
+      <div class="flow" aria-label="Learn, then teach, then keep">
+        <span>01 &nbsp; Learn</span><i aria-hidden="true">&rarr;</i>
+        <span>02 &nbsp; Teach</span><i aria-hidden="true">&rarr;</i>
+        <span>03 &nbsp; Keep</span>
+      </div>
+    </header>
+
+    <div id="error" class="error" role="alert" hidden></div>
+    <div id="auth-notice" class="notice" hidden></div>
+    <div id="queued-notice" class="notice" role="status" hidden></div>
+    <details id="source-warnings" class="notice" hidden><summary>Source inspection notices</summary><div id="source-warning-list"></div></details>
+
+    <details class="connection" id="connection" open hidden>
+      <summary id="connection-summary">Connect to your local Brainstem</summary>
+      <form id="connection-form">
+        <label for="base-url">Local Brainstem URL</label>
+        <div class="inline-field">
+          <input id="base-url" type="url" value="http://127.0.0.1:7071" required spellcheck="false" autocomplete="off">
+          <button id="connect" type="submit">Connect</button>
+        </div>
+        <p class="small muted" style="margin-top:8px">Loopback only. Changing servers starts a new workbench conversation.</p>
+      </form>
+      <div class="meta" id="connection-meta"></div>
+    </details>
+
+    <div class="stack">
+      <section class="card">
+        <div class="card-head"><h2>Start with a conversation</h2><span class="pill">Copilot chat</span></div>
+        <p class="muted">Same familiar words: Brainstem, Brain Surgeon, soul, memory, capabilities. Native Copilot does the work. No RAPP installation, Python server, or IDE required.</p>
+        <div class="actions">
+          <button type="button" class="primary" id="setup">Give me my Brainstem</button>
+          <button type="button" id="teach">Teach a new capability</button>
+          <button type="button" id="open-engine" hidden>Open Frontier engine</button>
+        </div>
+      </section>
+
+      <div class="columns">
+        <section class="card">
+          <div class="card-head"><h2>Your capabilities</h2><span class="pill" id="agent-count">Loading skill sources</span></div>
+          <ul class="capabilities" id="capabilities" aria-label="Installed capabilities"></ul>
+          <div class="empty" id="capabilities-empty">
+            <p>Your Copilot skills will appear here.</p>
+            <p class="small">Brain Surgeon can help turn your next real task into a skill you keep.</p>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-head"><h2>See the source</h2><span class="pill">Your files</span></div>
+          <label for="source-file" id="source-label">Copilot skill source</label>
+          <div class="inline-field">
+            <select id="source-file"><option value="">Loading skill sources</option></select>
+            <button type="button" id="show-source" disabled>Show source</button>
+          </div>
+          <p class="small muted" id="source-help" style="margin-top:12px">Standard SKILL.md files, not a Brainstem-only format. Your skills work without this plugin, too.</p>
+        </section>
+      </div>
+
+      <section class="card source" id="source-section" hidden>
+        <div class="card-head"><h2 id="source-title">Agent source</h2><button type="button" id="keep">Keep this capability</button></div>
+        <pre id="source-content" tabindex="0" aria-label="Agent source code"></pre>
+      </section>
+
+      <section class="card" id="profile-section">
+        <div class="card-head"><h2>Soul &amp; memory</h2><button type="button" id="review-profile">Review in chat</button></div>
+        <p class="muted small">Your working instructions and explicitly approved notes. Copilot's own Memory is separate; nothing is saved just because you chatted.</p>
+        <details style="margin-top:12px"><summary>Read my soul</summary><pre id="soul-content" tabindex="0"></pre></details>
+        <div id="memory-notes" class="meta"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Use your Brainstem</h2><span class="pill" id="execution-kind">Native Copilot</span></div>
+        <form id="run-form">
+          <label for="prompt">What should your Brainstem do?</label>
+          <textarea id="prompt" maxlength="32000" required placeholder="Describe one real task. Your Copilot Brainstem will take it from here."></textarea>
+          <div class="actions end">
+            <span class="small muted" id="run-hint">Continues in Copilot chat with normal approvals.</span>
+            <button type="button" id="cancel" hidden>Stop waiting</button>
+            <button type="submit" class="primary" id="run-button">Send to Copilot</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Visible work</h2><button type="button" id="new-conversation">Clear activity</button></div>
+        <div class="empty" id="runs-empty"><p>No tool activity yet.</p><p class="small">Native tool events appear here. Copilot chat holds the full requests, approvals, and results.</p></div>
+        <div class="runs" id="runs" aria-live="polite" aria-relevant="additions text"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Frontier</h2><span class="pill">Optional</span></div>
+        <p class="muted small">Want the separate RAPP Brainstem engine and its Python agents? Connect it here. It is never installed, started, or contacted by default.</p>
+        <div class="actions">
+          <button type="button" id="enable-frontier">Enable Frontier</button>
+          <button type="button" id="return-native" hidden>Return to native Copilot</button>
+          <button type="button" id="refresh-native">Refresh skill sources</button>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      Native by default. Model requests and tool permissions stay with GitHub Copilot.
+      The workbench keeps bounded tool-event metadata and your explicitly saved profile in private local files, outside the project.
+      Frontier has its own separate request history when you choose to use it.
+    </footer>
+  </main>
+
+  <dialog id="confirmation" aria-labelledby="confirmation-title">
+    <h2 id="confirmation-title">Run this request?</h2>
+    <p id="confirmation-description"></p>
+    <pre id="confirmation-preview"></pre>
+    <div class="actions end">
+      <button type="button" id="confirmation-cancel">Cancel</button>
+      <button type="button" class="primary" id="confirmation-accept">Run request</button>
+    </div>
+  </dialog>
+
+  <script>/*__BRAINSTEM_BRIDGE__*/</script>
+  <script>
+    (() => {
+      const host = window.brainstemHost;
+      const $ = (id) => document.getElementById(id);
+      let currentApp = null;
+      let current = null;
+      let confirmedAction = null;
+      let lastFiles = "";
+      let lastRuns = "";
+      let pending = false;
+
+      function showError(error) {
+        $("error").textContent = error.message || String(error);
+        $("error").hidden = false;
+      }
+
+      function addText(parent, tag, text, className) {
+        const element = document.createElement(tag);
+        element.textContent = text;
+        if (className) element.className = className;
+        parent.append(element);
+        return element;
+      }
+
+      function readiness(health) {
+        if (!health) return ["Not connected", ""];
+        if (health.status === "unauthenticated") return ["Sign-in needed", "warning"];
+        if (health.copilot === "no_access") return ["Copilot access needed", "warning"];
+        if (health.copilot === "pending") return ["Running - auth pending", "warning"];
+        return ["Running", "ready"];
+      }
+
+      function renderFrontier(state) {
+        current = state;
+        const [label, tone] = readiness(state.health);
+        $("status-text").textContent = state.busy ? state.busy.charAt(0).toUpperCase() + state.busy.slice(1) : label;
+        $("status-dot").className = `dot ${tone}`;
+        $("connection-summary").textContent = state.health ? `Connected to ${state.baseUrl}` : "Connect to your local Brainstem";
+        if (document.activeElement !== $("base-url")) $("base-url").value = state.baseUrl;
+        $("connect").textContent = state.health ? "Refresh" : "Connect";
+        $("error").hidden = !state.error;
+        $("error").textContent = state.error || "";
+        const authMessages = {
+          unauthenticated: 'Open Brainstem to sign in, or ask Copilot to guide you. This plugin never reads or copies your credentials.',
+          no_access: "This account needs Copilot access. Open Brainstem to resolve the account issue before running a request.",
+          pending: "Brainstem is running. Copilot authorization will be confirmed on its first model request.",
+        };
+        const authMessage = authMessages[state.health?.status] || authMessages[state.health?.copilot];
+        $("auth-notice").hidden = !authMessage;
+        $("auth-notice").textContent = authMessage || "";
+        $("connection-meta").replaceChildren();
+        if (state.health?.version) addText($("connection-meta"), "span", `Brainstem ${state.health.version}`);
+        if (state.health?.model) addText($("connection-meta"), "span", `Model: ${state.health.model}`);
+        if (state.checkedAt) addText($("connection-meta"), "span", `Checked ${new Date(state.checkedAt).toLocaleTimeString()}`);
+        const agents = state.health?.agents || [];
+        $("capabilities").replaceChildren();
+        agents.forEach((name) => addText($("capabilities"), "li", name));
+        $("agent-count").textContent = `${agents.length} ${agents.length === 1 ? "capability" : "capabilities"}`;
+        $("capabilities-empty").hidden = agents.length > 0;
+        if (state.health && !agents.length) {
+          $("capabilities-empty").firstElementChild.textContent = "No capabilities are installed yet.";
+        }
+        const filesKey = JSON.stringify(state.files);
+        if (lastFiles !== filesKey) {
+          const selected = $("source-file").value;
+          $("source-file").replaceChildren();
+          if (!state.files.length) addText($("source-file"), "option", state.health ? "No agent files" : "Connect to load files").value = "";
+          state.files.forEach((file) => {
+            addText($("source-file"), "option", file.filename).value = file.filename;
+          });
+          if (state.files.some((file) => file.filename === selected)) $("source-file").value = selected;
+          lastFiles = filesKey;
+        }
+        $("source-section").hidden = !state.source;
+        $("source-title").textContent = state.source?.filename || "Agent source";
+        $("source-content").textContent = state.source?.content || "";
+        const isBusy = Boolean(state.busy) || pending;
+        ["connect", "run-button", "new-conversation"].forEach((id) => { $(id).disabled = isBusy; });
+        $("show-source").disabled = isBusy || !$("source-file").value;
+        $("cancel").hidden = state.busy !== "running a capability";
+        $("run-button").disabled = isBusy || !state.health || state.health.status === "unauthenticated" || state.health.copilot === "no_access";
+        $("run-button").textContent = "Review & run";
+        $("source-label").textContent = "Frontier Python agent";
+        $("source-help").textContent = "Portable Python files in the optional RAPP engine. Native mode uses ordinary Copilot skills.";
+        $("new-conversation").textContent = "New conversation";
+        $("runs-empty").firstElementChild.textContent = "No Frontier runs yet.";
+        $("runs-empty").lastElementChild.textContent = "Real engine requests, agent logs, and results appear here.";
+        $("run-hint").textContent = state.busy === "running a capability" ? "Waiting for Brainstem. Agent logs arrive with the result." : "Requests use Brainstem's existing /chat API.";
+        $("runs-empty").hidden = state.runs.length > 0;
+        const runsKey = JSON.stringify(state.runs);
+        if (lastRuns !== runsKey) {
+          const openIds = new Set([...$("runs").querySelectorAll("details[open]")].map((item) => item.dataset.id));
+          $("runs").replaceChildren();
+          [...state.runs].reverse().forEach((run, index) => {
+            const details = document.createElement("details");
+            details.className = "run";
+            details.dataset.id = run.id;
+            details.open = index === 0 || openIds.has(run.id);
+            const summary = document.createElement("summary");
+            addText(summary, "span", run.prompt, "run-prompt");
+            const labels = { running: "Working", done: "Done", error: "Failed", unknown: "Uncertain" };
+            addText(summary, "span", labels[run.status], `run-status ${run.status}`);
+            details.append(summary);
+            const body = document.createElement("div");
+            body.className = "run-body";
+            addText(body, "p", run.prompt, "small muted");
+            if (run.response) {
+              addText(body, "h3", "Result");
+              addText(body, "p", run.response);
+            }
+            if (run.error) addText(body, "p", run.error, "small");
+            if (run.status === "done") {
+              addText(body, "h3", "Agent log");
+              addText(body, "pre", run.agent_logs || "No agent tool calls were reported by Brainstem.");
+            }
+            if (run.model) addText(body, "p", `Answered by ${run.model}`, "small muted");
+            details.append(body);
+            $("runs").append(details);
+          });
+          lastRuns = runsKey;
+        }
+      }
+
+      function renderNative(state) {
+        current = null;
+        $("status-text").textContent = "Native Copilot";
+        $("status-dot").className = "dot ready";
+        $("auth-notice").hidden = true;
+        $("error").hidden = !state.error;
+        $("error").textContent = state.error || "";
+        $("capabilities").replaceChildren();
+        state.capabilities.forEach((skill) => {
+          const item = addText($("capabilities"), "li", skill.name);
+          item.title = `${skill.scope}: ${skill.description}`;
+        });
+        $("agent-count").textContent = `${state.capabilities.length} skill sources`;
+        $("capabilities-empty").hidden = state.capabilities.length > 0;
+        $("capabilities-empty").firstElementChild.textContent = "No skill sources discovered yet.";
+        $("capabilities-empty").lastElementChild.textContent = "Ask Brain Surgeon to help create a native Copilot skill in this project.";
+        const filesKey = `native:${JSON.stringify(state.capabilities)}`;
+        if (lastFiles !== filesKey) {
+          const selected = $("source-file").value;
+          $("source-file").replaceChildren();
+          if (!state.capabilities.length) addText($("source-file"), "option", "No Copilot skills found").value = "";
+          state.capabilities.forEach((skill) => {
+            addText($("source-file"), "option", `${skill.filename} (${skill.scope})`).value = skill.id;
+          });
+          if (state.capabilities.some((skill) => skill.id === selected)) $("source-file").value = selected;
+          lastFiles = filesKey;
+        }
+        $("source-label").textContent = "Copilot skill source";
+        $("source-help").textContent = "Standard SKILL.md files, not a Brainstem-only format. Source discovery does not claim a skill has been exercised or activated in every open session.";
+        const selectedSkill = state.capabilities.find((skill) => skill.id === $("source-file").value);
+        $("show-source").disabled = !selectedSkill || selectedSkill.sourceAvailable === false;
+        if (selectedSkill?.sourceAvailable === false) {
+          $("source-help").textContent = "This skill is larger than the workbench's source preview limit. Ask Copilot to inspect it with native file tools.";
+        }
+        $("source-section").hidden = !state.source;
+        $("source-title").textContent = state.source?.filename || "Skill source";
+        $("source-content").textContent = state.source?.content || "";
+        $("soul-content").textContent = state.context?.soul || "";
+        $("memory-notes").replaceChildren();
+        const notes = state.context?.notes || [];
+        if (!notes.length) addText($("memory-notes"), "span", "No durable notes saved.");
+        notes.forEach((note) => addText($("memory-notes"), "span", note.text));
+        $("run-button").disabled = pending;
+        $("run-button").textContent = "Send to Copilot";
+        $("cancel").hidden = true;
+        $("run-hint").textContent = "Continues in Copilot chat with normal approvals.";
+        $("new-conversation").textContent = "Clear activity";
+        $("new-conversation").disabled = state.activity.some((item) => item.status === "running");
+        $("runs-empty").hidden = state.activity.length > 0;
+        $("runs-empty").firstElementChild.textContent = "No tool activity yet.";
+        $("runs-empty").lastElementChild.textContent = "Native tool events appear here. Copilot chat holds the full requests, approvals, and results.";
+        const runsKey = `native:${JSON.stringify(state.activity)}`;
+        if (lastRuns !== runsKey) {
+          $("runs").replaceChildren();
+          [...state.activity].reverse().forEach((event) => {
+            const row = document.createElement("div");
+            row.className = "run";
+            addText(row, "h3", event.tool);
+            const labels = { running: "Running", done: "Completed", error: "Failed", unknown: "Completion unknown" };
+            addText(row, "span", labels[event.status], `run-status ${event.status}`);
+            addText(row, "p", new Date(event.startedAt).toLocaleTimeString(), "small muted");
+            $("runs").append(row);
+          });
+          lastRuns = runsKey;
+        }
+      }
+
+      function render(state) {
+        currentApp = state;
+        const frontier = state.mode === "frontier";
+        $("connection").hidden = !frontier;
+        $("open-engine").hidden = !frontier;
+        $("profile-section").hidden = frontier;
+        $("enable-frontier").hidden = frontier;
+        $("return-native").hidden = !frontier;
+        $("refresh-native").hidden = frontier;
+        $("execution-kind").textContent = frontier ? "Frontier engine" : "Native Copilot";
+        $("source-warnings").hidden = frontier || !state.warnings.length;
+        $("source-warning-list").replaceChildren();
+        state.warnings.forEach((warning) => addText($("source-warning-list"), "p", warning));
+        if (frontier) renderFrontier(state.frontier);
+        else renderNative(state);
+      }
+
+      async function act(action, args = {}) {
+        try {
+          return await host.request(action, args);
+        } catch (error) {
+          if (currentApp) {
+            currentApp.error = error.message || String(error);
+            if (currentApp.mode === "frontier" && currentApp.frontier) currentApp.frontier.error = currentApp.error;
+          }
+          showError(error);
+          return null;
+        }
+      }
+
+      function confirm(title, description, preview, label, action) {
+        $("confirmation-title").textContent = title;
+        $("confirmation-description").textContent = description;
+        $("confirmation-preview").textContent = preview;
+        $("confirmation-preview").hidden = !preview;
+        $("confirmation-accept").textContent = label;
+        confirmedAction = action;
+        $("confirmation").showModal();
+        $("confirmation-cancel").focus();
+      }
+
+      $("confirmation-cancel").addEventListener("click", () => {
+        confirmedAction = null;
+        $("confirmation").close();
+      });
+      $("confirmation").addEventListener("cancel", () => { confirmedAction = null; });
+      $("confirmation-accept").addEventListener("click", async () => {
+        const action = confirmedAction;
+        confirmedAction = null;
+        $("confirmation").close();
+        if (action) await action();
+      });
+      $("connection-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const connect = () => act("connect", { baseUrl: $("base-url").value });
+        if (current?.runs.length && $("base-url").value.replace(/\/$/, "") !== current.baseUrl) {
+          confirm("Connect to a different Brainstem?", "This starts a new workbench conversation. It does not delete agents or Brainstem memories.", "", "Connect", connect);
+        } else {
+          await connect();
+        }
+      });
+      $("source-file").addEventListener("change", () => {
+        const selected = currentApp?.capabilities.find((skill) => skill.id === $("source-file").value);
+        $("show-source").disabled = Boolean(current?.busy) || !$("source-file").value ||
+          (currentApp?.mode === "copilot" && selected?.sourceAvailable === false);
+        if (currentApp?.mode === "copilot") {
+          $("source-help").textContent = selected?.sourceAvailable === false ?
+            "This skill is larger than the workbench's source preview limit. Ask Copilot to inspect it with native file tools." :
+            "Standard SKILL.md files, not a Brainstem-only format. Your skills work without this plugin, too.";
+        }
+      });
+      $("show-source").addEventListener("click", () => act("source", currentApp?.mode === "frontier" ?
+        { filename: $("source-file").value } : { id: $("source-file").value }));
+      $("run-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const prompt = $("prompt").value.trim();
+        if (!prompt) return showError(new Error("Enter a request before running a capability."));
+        if (currentApp?.mode !== "frontier") {
+          if (pending) return showError(new Error("A request is already being queued in Copilot."));
+          pending = true;
+          if (currentApp) render(currentApp);
+          const result = await act("native_run", { prompt });
+          pending = false;
+          if (currentApp) render(currentApp);
+          if (result) {
+            $("queued-notice").textContent = "Sent to Copilot chat. Continue there for any approvals and the result.";
+            $("queued-notice").hidden = false;
+          }
+          return;
+        }
+        confirm("Run this request?", "Brainstem may execute installed agent code using your local files and connected accounts. Only proceed with agents you trust. A model request can consume your Copilot allowance.", prompt, "Run request", async () => {
+          pending = true;
+          if (currentApp) render(currentApp);
+          await act("frontier_run", { prompt });
+          pending = false;
+          if (currentApp) render(currentApp);
+        });
+      });
+      $("cancel").addEventListener("click", () => act("cancel"));
+      $("new-conversation").addEventListener("click", () => {
+        const frontier = currentApp?.mode === "frontier";
+        confirm(frontier ? "Start a new conversation?" : "Clear workbench activity?",
+          frontier ? "Clear this workbench's Frontier requests and results. Engine memories and agent files are not changed." :
+            "Clear this workbench's tool-event metadata. Your Copilot chat, soul, memory, and skills are not changed.",
+          "", frontier ? "Start new" : "Clear activity", () => act("new"));
+      });
+      $("setup").addEventListener("click", () => act("ask", { intent: "setup" }));
+      $("teach").addEventListener("click", () => act("ask", { intent: "teach" }));
+      $("keep").addEventListener("click", () => act("ask", { intent: "keep",
+        filename: currentApp?.mode === "frontier" ? current?.source?.filename : currentApp?.source?.filename }));
+      $("open-engine").addEventListener("click", () => act("open"));
+      $("review-profile").addEventListener("click", () => act("ask", { intent: "soul" }));
+      $("refresh-native").addEventListener("click", () => act("refresh"));
+      $("enable-frontier").addEventListener("click", () => confirm(
+        "Enable the optional Frontier engine?",
+        "Native Copilot needs no server. Frontier connects a separate RAPP Brainstem that can run Python agents and make additional model requests. Enabling it does not install or start anything.",
+        "", "Enable Frontier", () => act("mode", { mode: "frontier" }),
+      ));
+      $("return-native").addEventListener("click", () => act("mode", { mode: "copilot" }));
+      if (!host) {
+        showError(new Error("Open this workbench through the Brainstem Copilot extension or the documented preview server."));
+        return;
+      }
+      $("preview-notice").hidden = host.mode !== "preview";
+      host.subscribe(render);
+      host.request("state").then(render).catch(showError);
+    })();
+  </script>
+</body>
+</html>
