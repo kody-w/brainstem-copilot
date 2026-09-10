@@ -1,7 +1,8 @@
 # Brainstem Copilot
 
-**Brain Surgeon leads the main Copilot loop, building and using a Copilot-based
-Brainstem. No Brainstem server required.**
+**One Copilot chat. Talk to Brainstem or Brain Surgeon by name, with the same
+conversation, soul, memory, and capabilities. No agent-picker switching or
+Brainstem server required.**
 
 Keep the Brainstem way of working: a soul, explicit memory, useful capabilities,
 and a visible **Learn -> Teach -> Keep** loop. GitHub Copilot supplies the
@@ -37,21 +38,43 @@ If the marketplace has not been added yet, add it before installing the plugin:
 3. Open **Install plugin**, enter **`brainstem-copilot@brainstem-copilot`**,
    and click **Install**. Alternatively, browse the **brainstem-copilot**
    marketplace and click **Install** on its plugin.
-4. Start a new session, choose this plugin's **Brain Surgeon** agent, and say:
+4. Open a chat with the single **Brainstem Copilot** agent entry and say:
 
-   > Give me my Brainstem.
+   > Brain Surgeon, give me my Brainstem.
 
 **Install button disabled?** If the dialog says "Type a plugin name as
 plugin@marketplace", replace `kody-w/brainstem-copilot` with
 `brainstem-copilot@brainstem-copilot`. If it reports an unknown marketplace
 afterward, complete the separate **Add marketplace** step above.
 
-Brain Surgeon is the primary conversation and teaching loop. It builds and
-uses **Brainstem**, a native Copilot agent with your soul, approved memory,
-and learned capabilities. Native delegation is available when useful; simple
-work does not need a second agent. You can also choose Brainstem directly.
+### Talk to either role without leaving the chat
+
+> Brainstem, summarize these notes and suggest the next action.
+
+> Brain Surgeon, turn what we just did into a reusable capability.
+
+> Brainstem, use that capability on this next example.
+
+These are successive messages in **the same conversation**. Both roles see
+the earlier messages, soul, approved memory, and skill sources. Explicitly
+name the role you want; unaddressed follow-ups keep the most recently requested
+role. You can ask both to contribute in one response, too.
+
+Brain Surgeon leads the teaching loop; Brainstem uses the capabilities.
+They are two directly addressable roles, not two chats or two picker profiles.
+The Canvas's **Brainstem** and **Brain Surgeon** buttons send those same
+requests into your current chat. They do not select another agent or start
+another session. The matching native skills can also be invoked in an
+ordinary Copilot chat without requiring the Canvas.
+
 The app's normal approvals still apply. Organization policy may restrict
 custom plugins or extensions.
+
+**Upgrading from 0.1:** update the plugin once. The separate Brainstem and
+Brain Surgeon picker entries have been replaced by **Brainstem Copilot**.
+If an already-open session retains the old plugin definitions, load the
+updated plugin in a fresh session once; you do not create a new session for
+each role change. Your saved soul, notes, and capabilities are not rewritten.
 
 This repository is its own custom marketplace. Installation does not depend
 on placement in GitHub's featured or editor-curated catalog.
@@ -69,7 +92,7 @@ The CLI currently gates extension tools behind experimental features. To use
 the profile/workbench tools there, start with:
 
 ```sh
-copilot --experimental --agent brainstem-copilot:brain-surgeon
+copilot --experimental --agent brainstem-copilot:brainstem-copilot
 ```
 
 The app's agent picker handles the qualified agent ID for you. The bundled
@@ -79,8 +102,8 @@ agents and skills remain usable in chat when extension tools are unavailable.
 
 | Familiar word | What it means here |
 |---|---|
-| **Brainstem** | The Copilot-based agent carrying and using your learned capabilities |
-| **Brain Surgeon** | The main Copilot conversation, building and improving your Brainstem |
+| **Brainstem** | The same-chat role using your learned capabilities |
+| **Brain Surgeon** | The same-chat role leading learning and improving your Brainstem |
 | **Soul** | Your editable working instructions |
 | **Memory** | Explicitly approved local notes, separate from Copilot's own Memory |
 | **Capability** | An ordinary Copilot skill, custom agent, or tool |
@@ -88,14 +111,13 @@ agents and skills remain usable in chat when extension tools are unavailable.
 | **Frontier** | Opt into a separate RAPP Brainstem engine when you need it |
 
 ```text
-Brain Surgeon (main Copilot loop)
-              |
-Brainstem (native Copilot agent)
-  soul + approved notes + capabilities
-              |
-       Native Copilot tools
-              |
-    Visible actions and results
+One native Copilot conversation
+  Brainstem <-> Brain Surgeon
+  shared soul + notes + capabilities
+                 |
+        Native Copilot tools
+                 |
+     Visible actions and results
 ```
 
 There is no separate model service or external orchestration loop. Canvas buttons send user intent back
@@ -108,6 +130,8 @@ separate backend.
   the current project's `.github/skills`, and your `~/.copilot/skills`.
 - **Soul and memory:** inspect your working instructions and approved notes;
   request changes in chat through the native tool approval flow.
+- **Chat role:** address Brainstem or Brain Surgeon with one click or by name;
+  this changes neither the session nor the selected native agent profile.
 - **Visible work:** native tool-event names, status, and timing. Copilot chat
   remains the authoritative record of prompts, approvals, output, and results.
 - **Frontier:** an explicit optional switch for connecting an external engine.
@@ -181,7 +205,8 @@ The plugin keeps its own files outside your project and its installation:
 ```
 
 Native activity stores bounded tool-event metadata, not copies of tool
-arguments or output. Frontier stores a separate bounded conversation history
+arguments or output. The most recently addressed role is saved with that
+session's metadata; older activity files remain supported. Frontier stores a separate bounded conversation history
 when used. Reopening a workbench defaults to native mode; it does not silently
 restore or probe Frontier.
 
@@ -219,7 +244,7 @@ installing it globally or starting a Brainstem engine:
 
 ```sh
 copilot --experimental --plugin-dir . \
-  --agent brainstem-copilot:brain-surgeon \
+  --agent brainstem-copilot:brainstem-copilot \
   --allow-tool 'custom-tool(brainstem_context)' \
   -p 'Use brainstem_context once. Report the native mode and available skill sources. Do not enable Frontier or change any files.'
 ```

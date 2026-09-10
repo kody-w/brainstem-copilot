@@ -170,3 +170,21 @@ test("native completion events correlate with actual starts without copying tool
   assert.equal(state.activity[0].finishedAt, "2026-09-10T12:00:01Z");
   assert.equal(JSON.stringify([...f.stored.values()]).includes("not persisted"), false);
 });
+
+test("addressing either role retains the joined session and never selects another agent", async (t) => {
+  const f = await fixture(t);
+  const session = f.extension.session;
+  f.session.rpc.agent = { select: () => { throw new Error("No agent-picker switching"); } };
+  f.emit("user.message", { data: { content: "Brainstem, help with our shared task." } });
+  assert.equal((await f.invoke("brainstem_context")).role, "brainstem");
+  f.emit("user.message", { data: { content: "Brain Surgeon, improve what we just did." } });
+  await f.extension.idle();
+  assert.equal((await f.invoke("brainstem_context")).role, "brain-surgeon");
+  f.emit("user.message", { data: { content: "Continue with the same work." } });
+  assert.equal((await f.invoke("brainstem_context")).role, "brain-surgeon");
+  f.emit("user.message", { agentId: "other-agent", data: { content: "Brainstem, a different task." } });
+  assert.equal((await f.invoke("brainstem_context")).role, "brain-surgeon");
+  assert.equal(f.extension.session, session);
+  assert.equal(f.messages.length, 0);
+  assert.equal(f.registered.hooks, undefined);
+});

@@ -11,7 +11,7 @@ test("native controls work twice without an engine or network calls", async ({ p
   });
   await page.goto("/");
   await expect(page.getByText("Native Copilot", { exact: true }).first()).toBeVisible();
-  await expect(page.getByText("4 skill sources", { exact: true })).toBeVisible();
+  await expect(page.getByText("5 skill sources", { exact: true })).toBeVisible();
   await expect(page.getByText("Interactive preview.", { exact: false })).toBeVisible();
   await expect(page.getByLabel("Local Brainstem URL")).toBeHidden();
   for (let i = 0; i < 2; i++) {

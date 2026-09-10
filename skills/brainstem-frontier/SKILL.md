@@ -5,7 +5,7 @@ description: Optional Frontier mode only. Connect an existing RAPP Brainstem eng
 
 # Frontier: optional external engine
 
-The default Brainstem and Brain Surgeon are native Copilot agents. This skill
+Brainstem and Brain Surgeon are roles in one native Copilot chat. This skill
 is an explicit opt-in for users who want a separate RAPP engine. Do not invoke
 it just because the user says "Brainstem."
 

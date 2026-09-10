@@ -1,7 +1,7 @@
 {
   "name": "brainstem-copilot",
-  "version": "0.1.0",
-  "description": "Native Copilot Brainstem and Brain Surgeon agents. Learn, teach, and keep capabilities without a Brainstem server. Frontier is optional.",
+  "version": "0.2.0",
+  "description": "One Copilot chat with both Brainstem and Brain Surgeon. Address either by name with shared context, soul, memory, and capabilities. No picker switching or Brainstem server. Frontier is optional.",
   "author": {
     "name": "RAPP Brainstem contributors"
   },

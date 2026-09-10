@@ -33,6 +33,18 @@ test("the actual managed Canvas bridge queues native work and streams real contr
     await expect(page.getByText("read_file", { exact: true })).toBeVisible();
     await board.toolFinished({ id: "native-tool", name: "read_file", isError: false });
     await expect(page.getByText("Completed", { exact: true })).toBeVisible();
+    for (let i = 0; i < 2; i++) {
+      await page.getByRole("button", { name: "Talk to Brainstem", exact: true }).click();
+      await expect(page.getByRole("button", { name: "Talk to Brainstem", exact: true })).toHaveAttribute("aria-pressed", "true");
+      expect(board.snapshot().role).toBe("brainstem");
+      await page.getByRole("button", { name: "Talk to Brain Surgeon", exact: true }).click();
+      await expect(page.getByRole("button", { name: "Talk to Brain Surgeon", exact: true })).toHaveAttribute("aria-pressed", "true");
+      expect(board.snapshot().role).toBe("brain-surgeon");
+      await expect(page.getByText("Completed", { exact: true })).toBeVisible();
+      expect(board.snapshot().context.soul).toBe("Native test soul");
+    }
+    expect(sent.length).toBe(6);
+    expect(sent.slice(2).every((prompt) => prompt.includes("same chat"))).toBe(true);
     expect(board.snapshot().frontier).toBeNull();
     expect(errors).toEqual([]);
   } finally {

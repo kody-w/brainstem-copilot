@@ -169,7 +169,7 @@
         <span class="status" role="status"><span class="dot ready" id="status-dot"></span><span id="status-text">Native Copilot</span></span>
       </div>
       <h1>Your AI. Your capabilities.</h1>
-      <p class="lead">Brain Surgeon leads the conversation. Your Copilot-based Brainstem carries the capabilities. Learn, teach, and keep the source. No Brainstem server to run.</p>
+      <p class="lead">One conversation with Brainstem and Brain Surgeon. Address either by name, keep the same context, and learn together. No Brainstem server to run.</p>
       <div class="flow" aria-label="Learn, then teach, then keep">
         <span>01 &nbsp; Learn</span><i aria-hidden="true">&rarr;</i>
         <span>02 &nbsp; Teach</span><i aria-hidden="true">&rarr;</i>
@@ -197,13 +197,18 @@
 
     <div class="stack">
       <section class="card">
-        <div class="card-head"><h2>Start with a conversation</h2><span class="pill">Copilot chat</span></div>
-        <p class="muted">Same familiar words: Brainstem, Brain Surgeon, soul, memory, capabilities. Native Copilot does the work. No RAPP installation, Python server, or IDE required.</p>
+        <div class="card-head"><h2>One chat, either role</h2><span class="pill" id="chat-role">Brain Surgeon</span></div>
+        <p class="muted">Say "Brainstem, ..." to use your capabilities, or "Brain Surgeon, ..." to teach and improve them. Shared conversation, soul, and memory. No agent-picker switching.</p>
         <div class="actions">
           <button type="button" class="primary" id="setup">Give me my Brainstem</button>
           <button type="button" id="teach">Teach a new capability</button>
           <button type="button" id="open-engine" hidden>Open Frontier engine</button>
         </div>
+        <div class="actions" role="group" aria-label="Talk in this chat">
+          <button type="button" id="talk-brainstem" aria-label="Talk to Brainstem" aria-pressed="false">Brainstem</button>
+          <button type="button" id="talk-surgeon" aria-label="Talk to Brain Surgeon" aria-pressed="true">Brain Surgeon</button>
+        </div>
+        <p class="small muted" style="margin-top:8px">These buttons address the same chat. You can also just type either name.</p>
       </section>
 
       <div class="columns">
@@ -478,6 +483,12 @@
 
       function render(state) {
         currentApp = state;
+        const surgeon = state.role !== "brainstem";
+        $("chat-role").textContent = surgeon ? "Brain Surgeon" : "Brainstem";
+        $("talk-brainstem").setAttribute("aria-pressed", String(!surgeon));
+        $("talk-surgeon").setAttribute("aria-pressed", String(surgeon));
+        $("talk-brainstem").classList.toggle("primary", !surgeon);
+        $("talk-surgeon").classList.toggle("primary", surgeon);
         const frontier = state.mode === "frontier";
         $("connection").hidden = !frontier;
         $("open-engine").hidden = !frontier;
@@ -584,6 +595,8 @@
       });
       $("setup").addEventListener("click", () => act("ask", { intent: "setup" }));
       $("teach").addEventListener("click", () => act("ask", { intent: "teach" }));
+      $("talk-brainstem").addEventListener("click", () => act("ask", { intent: "brainstem" }));
+      $("talk-surgeon").addEventListener("click", () => act("ask", { intent: "brain-surgeon" }));
       $("keep").addEventListener("click", () => act("ask", { intent: "keep",
         filename: currentApp?.mode === "frontier" ? current?.source?.filename : currentApp?.source?.filename }));
       $("open-engine").addEventListener("click", () => act("open"));

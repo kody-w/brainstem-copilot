@@ -6,10 +6,12 @@ function previewBridge() {
     { id: "brainstem", name: "brainstem", filename: "brainstem/SKILL.md", scope: "plugin", description: "Your native Copilot Brainstem." },
     { id: "teach", name: "brainstem-teach", filename: "brainstem-teach/SKILL.md", scope: "plugin", description: "Learn, teach, keep." },
     { id: "memory", name: "brainstem-memory", filename: "brainstem-memory/SKILL.md", scope: "plugin", description: "Soul and explicit memory." },
+    { id: "surgeon", name: "brain-surgeon", filename: "brain-surgeon/SKILL.md", scope: "plugin", description: "Brain Surgeon in this same chat." },
     { id: "example", name: "explain-a-concept", filename: "explain-a-concept/SKILL.md", scope: "project", description: "An original sample Copilot skill." },
   ];
   let state = {
     mode: "copilot",
+    role: "brain-surgeon",
     context: { soul: "# My Brainstem\n\nUse native Copilot tools. Teach by doing. Ask before saving notes.", customSoul: false, notes: [] },
     capabilities: skills, warnings: [], source: null, activity: [], error: null, frontier: null,
   };
@@ -36,6 +38,9 @@ function previewBridge() {
         case "refresh": emit(); return snapshot();
         case "ask":
           prompts.push({ intent: args.intent, filename: args.filename });
+          if (["brainstem", "brain-surgeon"].includes(args.intent)) state.role = args.intent;
+          if (["setup", "teach"].includes(args.intent)) state.role = "brain-surgeon";
+          emit();
           return { queued: true };
         case "native_run":
           if (state.mode !== "copilot") throw new Error("Return to native Copilot.");
@@ -98,7 +103,7 @@ function previewBridge() {
       emit();
     },
     source(content) {
-      state.source = { ...skills[3], content };
+      state.source = { ...skills.find((skill) => skill.id === "example"), content };
       emit();
     },
     empty() {

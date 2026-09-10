@@ -19,8 +19,10 @@ test("the public marketplace references this actual installable plugin", async (
   assert.equal(packageJson.dependencies, undefined);
 });
 
-test("native onboarding and both agent roles keep the external engine optional", async () => {
-  for (const path of ["agents/brainstem.agent.md", "agents/brain-surgeon.agent.md", "skills/brainstem/SKILL.md"]) {
+test("one agent entry exposes both same-chat roles and keeps the external engine optional", async () => {
+  const agents = (await readdir(new URL("../agents/", import.meta.url))).filter((name) => name.endsWith(".agent.md"));
+  assert.deepEqual(agents, ["brainstem-copilot.agent.md"]);
+  for (const path of ["agents/brainstem-copilot.agent.md", "skills/brainstem/SKILL.md", "skills/brain-surgeon/SKILL.md"]) {
     const text = (await readFile(new URL(`../${path}`, import.meta.url), "utf8")).replaceAll("\r\n", "\n");
     assert.match(text, /^---\nname:/);
     assert.match(text, /native GitHub Copilot|native Copilot|native Copilot/);
