@@ -14,13 +14,37 @@ that engine.
 
 ## Install in the app
 
+**In the "Install plugin" dialog, paste this exact identifier:**
+
+```text
+brainstem-copilot@brainstem-copilot
+```
+
+The app has two different inputs. Do not paste the repository path into the
+plugin installation field:
+
+| Dialog | Value to enter |
+|---|---|
+| **Add marketplace** (GitHub repository or Git URL) | `kody-w/brainstem-copilot` |
+| **Install plugin** (`plugin@marketplace`) | `brainstem-copilot@brainstem-copilot` |
+
+If the marketplace has not been added yet, add it before installing the plugin:
+
 1. Open **Customize -> Plugins** in the GitHub Copilot app.
-2. Open marketplace settings and add
-   **`kody-w/brainstem-copilot`**.
-3. Install **brainstem-copilot** from the **brainstem-copilot** marketplace.
+2. Open **marketplace settings** using the gear beside the marketplace
+   selector, choose **Add marketplace**, and enter **`kody-w/brainstem-copilot`**.
+   This is not the **Install plugin** dialog.
+3. Open **Install plugin**, enter **`brainstem-copilot@brainstem-copilot`**,
+   and click **Install**. Alternatively, browse the **brainstem-copilot**
+   marketplace and click **Install** on its plugin.
 4. Start a new session, choose this plugin's **Brain Surgeon** agent, and say:
 
    > Give me my Brainstem.
+
+**Install button disabled?** If the dialog says "Type a plugin name as
+plugin@marketplace", replace `kody-w/brainstem-copilot` with
+`brainstem-copilot@brainstem-copilot`. If it reports an unknown marketplace
+afterward, complete the separate **Add marketplace** step above.
 
 Brain Surgeon is the primary conversation and teaching loop. It builds and
 uses **Brainstem**, a native Copilot agent with your soul, approved memory,
@@ -32,7 +56,10 @@ custom plugins or extensions.
 This repository is its own custom marketplace. Installation does not depend
 on placement in GitHub's featured or editor-curated catalog.
 
-For CLI users, the same package can also be installed directly:
+### CLI installation uses a different input format
+
+The CLI accepts a repository path directly. This command is for a terminal,
+not text to paste into the app's **Install plugin** field:
 
 ```sh
 copilot plugin install kody-w/brainstem-copilot
