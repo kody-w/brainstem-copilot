@@ -1,6 +1,6 @@
 {
   "name": "brainstem-copilot",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "One native Copilot chat with addressable Brainstem and Brain Surgeon roles, shared context, and an optional Frontier engine.",
   "type": "module",

@@ -66,552 +66,530 @@
       --cp-highlight: rgba(253, 142, 161, 0.12);
     }
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html, body { margin: 0; width: 100%; height: 100%; }
     body {
-      margin: 0; padding: 24px; background: var(--cp-bg); color: var(--cp-text);
+      display: flex; flex-direction: column; overflow: hidden;
+      background: var(--cp-bg); color: var(--cp-text);
       font: 14px/1.55 "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    main { max-width: 920px; margin: 0 auto; }
-    h1, h2, h3, p { margin: 0; }
-    h1 { font-size: 32px; line-height: 1.15; font-weight: 650; letter-spacing: -1px; }
-    h2 { font-size: 17px; font-weight: 650; }
-    h3 { font-size: 13px; font-weight: 650; }
     button, input, textarea, select { font: inherit; }
-    button, .button-link {
-      min-height: 40px; padding: 8px 16px; border: 1px solid var(--cp-border); border-radius: 0.625rem;
-      background: var(--cp-surface); color: var(--cp-text); font-weight: 600; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+    button {
+      min-height: 36px; padding: 6px 12px; border: 1px solid var(--cp-border);
+      border-radius: 0.625rem; background: var(--cp-surface-soft); color: var(--cp-text);
+      cursor: pointer; font-weight: 600;
     }
-    button:hover, .button-link:hover { border-color: var(--cp-border-strong); background: var(--cp-surface-soft); }
-    button.primary { background: var(--cp-accent); border-color: var(--cp-accent); color: var(--cp-accent-fg); }
-    button.primary:hover { background: var(--cp-accent-hover); }
+    button:hover { border-color: var(--cp-border-strong); background: var(--cp-bg-elevated); }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button.primary, .send { background: var(--cp-accent); border-color: var(--cp-accent); color: var(--cp-accent-fg); }
+    button.primary:hover, .send:hover { background: var(--cp-accent-hover); color: var(--cp-accent-fg); }
     :focus-visible { outline: 3px solid var(--cp-link); outline-offset: 3px; }
-    input, textarea, select {
-      border: 1px solid var(--cp-border); border-radius: 0.625rem; background: var(--cp-bg-elevated);
-      color: var(--cp-text); padding: 10px 12px; width: 100%; min-width: 0;
-    }
-    textarea { resize: vertical; min-height: 92px; }
-    textarea::placeholder, input::placeholder { color: var(--cp-text-soft); }
-    label { display: block; font-size: 12px; font-weight: 600; color: var(--cp-text-muted); margin-bottom: 8px; }
-    .eyebrow { color: var(--cp-accent); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
-    .muted { color: var(--cp-text-muted); }
-    .small { font-size: 12px; }
-    .lead { margin-top: 12px; max-width: 560px; color: var(--cp-text-muted); }
-    .topline { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
-    .status { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; white-space: nowrap; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cp-border-strong); flex-shrink: 0; }
-    .dot.ready { background: var(--cp-success); }
+    .icon { width: 36px; padding: 6px; flex-shrink: 0; display: inline-grid; place-items: center; }
+    .icon svg, .brand svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+    .brand { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 0.625rem; background: var(--cp-accent); color: var(--cp-accent-fg); flex-shrink: 0; font-weight: 700; }
+    .brand.surgeon { background: var(--cp-surface-soft); color: var(--cp-text); border: 1px solid var(--cp-border); }
+    .workspace { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); flex: 1; min-height: 0; }
+    .workspace.surgeon-hidden { grid-template-columns: minmax(0, 1fr); }
+    .pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--cp-surface); }
+    .surgeon-pane { border-left: 1px solid var(--cp-border); background: var(--cp-surface-soft); }
+    .pane-header { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-height: 64px; padding: 12px 16px; border-bottom: 1px solid var(--cp-border); background: var(--cp-bg-elevated); flex-shrink: 0; }
+    .title { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+    h1, h2, p { margin: 0; }
+    .title h1, .title h2 { font-size: 17px; font-weight: 650; }
+    .version, .subtle { color: var(--cp-text-soft); font-size: 11px; }
+    .toolbar { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+    .connection { font-size: 11px; display: inline-flex; align-items: center; gap: 6px; color: var(--cp-text-soft); }
+    .dot { width: 7px; height: 7px; background: var(--cp-success); border-radius: 50%; flex-shrink: 0; }
     .dot.warning { background: var(--cp-warning); }
-    .flow { display: flex; align-items: center; gap: 8px; margin: 24px 0; flex-wrap: wrap; }
-    .flow span { background: var(--cp-accent-soft); color: var(--cp-accent); padding: 4px 12px; border-radius: 0.625rem; font-size: 12px; font-weight: 600; }
-    .flow i { color: var(--cp-text-soft); font-style: normal; }
-    .card { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 20px; min-width: 0; }
-    .card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .stack { display: grid; gap: 16px; }
-    .columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
-    .actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
-    .actions.end { justify-content: flex-end; }
-    .inline-field { display: flex; align-items: stretch; gap: 8px; }
-    .inline-field input, .inline-field select { flex: 1; }
-    .inline-field button { flex-shrink: 0; }
-    .connection { margin-bottom: 16px; }
-    .connection summary { color: var(--cp-text-muted); font-size: 12px; cursor: pointer; padding: 4px 0; }
-    .connection form { padding-top: 16px; }
-    .meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; font-size: 12px; color: var(--cp-text-muted); }
-    .meta span { overflow-wrap: anywhere; }
-    .pill { border: 1px solid var(--cp-border); border-radius: 0.625rem; padding: 2px 8px; font-size: 11px; color: var(--cp-text-muted); }
-    .capabilities { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; }
-    .capabilities li { padding: 6px 10px; background: var(--cp-surface-soft); border-radius: 0.625rem; overflow-wrap: anywhere; font-size: 12px; }
-    .empty { border: 1px dashed var(--cp-border); padding: 20px; border-radius: 0.625rem; color: var(--cp-text-muted); }
-    .empty p + p { margin-top: 4px; }
-    .error, .notice { padding: 12px 16px; border: 1px solid var(--cp-border); border-left: 3px solid var(--cp-danger); background: var(--cp-surface); border-radius: 0.625rem; overflow-wrap: anywhere; margin-bottom: 16px; }
-    .error { color: var(--cp-danger); }
-    .notice { border-left-color: var(--cp-accent); color: var(--cp-text-muted); font-size: 12px; }
-    [hidden] { display: none !important; }
-    pre, code { font-family: Consolas, "Courier New", Courier, monospace; }
-    pre { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--cp-bg-elevated); border: 1px solid var(--cp-border); padding: 12px; border-radius: 0.625rem; font-size: 12px; line-height: 1.65; margin: 8px 0 0; max-height: 400px; overflow-y: auto; }
-    .source { margin-top: 16px; }
-    .source pre { white-space: pre; overflow-x: auto; }
-    .runs { display: grid; gap: 12px; }
-    .run { border: 1px solid var(--cp-border); border-radius: 0.625rem; padding: 12px; }
-    .run summary { cursor: pointer; display: flex; align-items: center; gap: 12px; }
-    .run-prompt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
-    .run-status { color: var(--cp-text-muted); font-size: 11px; }
-    .run-status.done { color: var(--cp-success); }
-    .run-status.error { color: var(--cp-danger); border: 0; background: var(--cp-surface); padding: 0; margin: 0; }
-    .run-status.unknown { color: var(--cp-warning); }
-    .run-body { margin-top: 12px; }
-    .run-body h3 { margin-top: 12px; }
-    .run-body p { white-space: pre-wrap; overflow-wrap: anywhere; }
-    footer { margin: 20px 0 4px; color: var(--cp-text-muted); font-size: 11px; line-height: 1.7; }
-    dialog { width: min(480px, calc(100vw - 32px)); border: 1px solid var(--cp-border); border-radius: 16px; padding: 24px; background: var(--cp-surface); color: var(--cp-text); }
-    dialog::backdrop { background: var(--cp-overlay); }
-    dialog p { margin-top: 12px; }
-    @media (max-width: 640px) {
-      body { padding: 16px; }
-      .columns { grid-template-columns: minmax(0, 1fr); }
-      h1 { font-size: 28px; }
-      .card { padding: 16px; }
+    .model { max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; padding: 4px 8px; border: 1px solid var(--cp-border); border-radius: 0.625rem; color: var(--cp-text-soft); }
+    .shared-strip { padding: 8px 16px; border-bottom: 1px solid var(--cp-border); color: var(--cp-text-soft); font-size: 11px; flex-shrink: 0; }
+    .chat-body { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 24px; scrollbar-gutter: stable; }
+    .welcome { width: 80%; max-width: 760px; margin: 24px auto; padding: 0 4px; color: var(--cp-text-soft); }
+    .welcome h2 { color: var(--cp-text); font-size: 20px; line-height: 1.35; margin-bottom: 12px; }
+    .welcome p { margin-bottom: 16px; }
+    .welcome ul { padding-left: 22px; margin: 20px 0; }
+    .welcome li { margin: 8px 0; }
+    .welcome strong { color: var(--cp-text); }
+    .tour { border-radius: 24px; color: var(--cp-accent); padding: 8px 18px; }
+    .surgeon-welcome { margin-top: 40px; }
+    .surgeon-welcome h2 { font-size: 17px; }
+    .messages { display: flex; flex-direction: column; gap: 16px; }
+    .message { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+    .message.user { align-items: flex-end; }
+    .bubble { max-width: min(92%, 760px); padding: 12px 16px; border: 1px solid var(--cp-border); border-radius: 18px; background: var(--cp-bg-elevated); min-width: 0; }
+    .user .bubble { background: var(--cp-accent); color: var(--cp-accent-fg); border-color: var(--cp-accent); border-bottom-right-radius: 6px; }
+    .assistant .bubble { border-bottom-left-radius: 6px; }
+    .bubble-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .message-meta { color: var(--cp-text-soft); font-size: 10px; margin: 4px 6px 0; }
+    .thinking { color: var(--cp-text-soft); font-size: 12px; padding: 16px 4px; }
+    .composer-area { border-top: 1px solid var(--cp-border); padding: 14px 20px 16px; background: var(--cp-bg-elevated); flex-shrink: 0; }
+    .suggestions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .suggestions button { border-radius: 24px; font-size: 12px; color: var(--cp-accent); font-weight: 500; padding: 6px 12px; }
+    .composer-tools { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; }
+    .text-button { background: var(--cp-bg-elevated); padding: 0; border: 0; min-height: 24px; font-size: 11px; font-weight: 500; color: var(--cp-text-soft); }
+    .text-button:hover { color: var(--cp-accent); }
+    .composer { display: flex; align-items: flex-end; gap: 10px; }
+    textarea, input, select {
+      color: var(--cp-text); background: var(--cp-surface); border: 1px solid var(--cp-border);
+      border-radius: 0.625rem; padding: 10px 12px; min-width: 0; font: inherit;
     }
-    @media (max-width: 380px) {
-      body { padding: 12px; }
-      .topline { align-items: flex-start; flex-direction: column; gap: 8px; }
-      .inline-field { flex-direction: column; }
+    .composer textarea { flex: 1; width: 100%; resize: none; min-height: 46px; max-height: 120px; border-radius: 24px; padding: 12px 18px; }
+    textarea::placeholder, input::placeholder { color: var(--cp-text-soft); }
+    .send { width: 46px; height: 46px; border-radius: 50%; font-size: 26px; line-height: 1; padding: 0; flex-shrink: 0; }
+    .surgeon-composer { border: 1px solid var(--cp-border); border-radius: 24px; padding: 12px; background: var(--cp-surface); }
+    .surgeon-composer textarea { border: 0; border-radius: 12px; min-height: 72px; background: var(--cp-surface); }
+    .composer-hint { color: var(--cp-text-soft); font-size: 10px; padding-top: 7px; text-align: center; }
+    .queue-status { color: var(--cp-text-soft); font-size: 11px; min-height: 0; }
+    .queue-status:not(:empty) { margin-bottom: 8px; }
+    .notice { flex-shrink: 0; max-height: 120px; overflow: auto; padding: 8px 16px; border-bottom: 1px solid var(--cp-border); background: var(--cp-bg-elevated); color: var(--cp-text-soft); font-size: 12px; overflow-wrap: anywhere; }
+    .error { color: var(--cp-danger); }
+    dialog { width: min(720px, calc(100vw - 24px)); max-height: calc(100dvh - 32px); border: 1px solid var(--cp-border); border-radius: 16px; padding: 0; background: var(--cp-surface); color: var(--cp-text); }
+    dialog::backdrop { background: var(--cp-overlay); }
+    .dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--cp-border); }
+    .dialog-head h2 { font-size: 18px; }
+    .tabs { display: flex; gap: 4px; padding: 12px 16px 0; flex-wrap: wrap; }
+    .tabs button[aria-selected="true"] { color: var(--cp-accent); background: var(--cp-accent-soft); border-color: var(--cp-accent); }
+    .drawer-panel { padding: 20px; }
+    .drawer-panel p { margin-bottom: 12px; }
+    .actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 16px 0 0; }
+    .actions.end { justify-content: flex-end; }
+    .inline-field { display: flex; gap: 8px; }
+    .inline-field input, .inline-field select { flex: 1; width: 100%; }
+    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+    .capabilities { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+    .capabilities li { border: 1px solid var(--cp-border); border-radius: 0.625rem; padding: 6px 10px; font-size: 12px; overflow-wrap: anywhere; }
+    .empty { color: var(--cp-text-soft); border: 1px dashed var(--cp-border); border-radius: 0.625rem; padding: 16px; margin: 12px 0; }
+    .muted { color: var(--cp-text-soft); }
+    .small { font-size: 12px; }
+    pre, code { font-family: Consolas, "Courier New", Courier, monospace; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto; max-height: 360px; padding: 12px; background: var(--cp-bg-elevated); border: 1px solid var(--cp-border); border-radius: 0.625rem; font-size: 12px; }
+    #source-content { white-space: pre; }
+    .activity-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--cp-border); font-size: 12px; overflow-wrap: anywhere; }
+    #confirmation { padding: 24px; max-width: 480px; }
+    #confirmation p { margin-top: 12px; }
+    @media (min-width: 1400px) { .welcome { margin-top: 36px; } .chat-body { padding: 28px 36px; } }
+    @media (max-width: 900px) {
+      .pane-header { padding: 10px 12px; gap: 8px; }
+      .title h1, .title h2 { font-size: 15px; }
+      .model { max-width: 120px; }
+      .chat-body { padding: 16px; }
+      .composer-area { padding: 12px; }
+    }
+    @media (max-width: 700px) {
+      body { overflow: auto; height: auto; min-height: 100dvh; }
+      .workspace { grid-template-columns: minmax(0, 1fr); flex: auto; }
+      .pane { height: max(460px, 65dvh); }
+      .surgeon-pane { height: max(400px, 55dvh); border-left: 0; border-top: 1px solid var(--cp-border-strong); }
+      .welcome { width: 100%; margin: 12px auto; }
+      .welcome h2 { font-size: 18px; }
+      .welcome ul { margin: 12px 0; }
+      .version { display: none; }
+      .pane-header .connection { margin-left: auto; }
+      .toolbar { width: 100%; justify-content: flex-end; }
+      .surgeon-pane .toolbar { width: auto; }
+      .suggestions { gap: 5px; }
+      .suggestions button { font-size: 11px; padding: 5px 8px; }
+      .inline-field { flex-wrap: wrap; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <div id="preview-notice" class="notice" hidden>Interactive preview. Sample data only; no real agent actions or account access.</div>
-    <header>
-      <div class="topline">
-        <span class="eyebrow">Brainstem Copilot</span>
-        <span class="status" role="status"><span class="dot ready" id="status-dot"></span><span id="status-text">Native Copilot</span></span>
-      </div>
-      <h1>Your AI. Your capabilities.</h1>
-      <p class="lead">One conversation with Brainstem and Brain Surgeon. Address either by name, keep the same context, and learn together. No Brainstem server to run.</p>
-      <div class="flow" aria-label="Learn, then teach, then keep">
-        <span>01 &nbsp; Learn</span><i aria-hidden="true">&rarr;</i>
-        <span>02 &nbsp; Teach</span><i aria-hidden="true">&rarr;</i>
-        <span>03 &nbsp; Keep</span>
-      </div>
-    </header>
-
-    <div id="error" class="error" role="alert" hidden></div>
-    <div id="auth-notice" class="notice" hidden></div>
-    <div id="queued-notice" class="notice" role="status" hidden></div>
-    <details id="source-warnings" class="notice" hidden><summary>Source inspection notices</summary><div id="source-warning-list"></div></details>
-
-    <details class="connection" id="connection" open hidden>
-      <summary id="connection-summary">Connect to your local Brainstem</summary>
-      <form id="connection-form">
-        <label for="base-url">Local Brainstem URL</label>
-        <div class="inline-field">
-          <input id="base-url" type="url" value="http://127.0.0.1:7071" required spellcheck="false" autocomplete="off">
-          <button id="connect" type="submit">Connect</button>
+  <div id="preview-notice" class="notice" hidden>Interactive preview. Sample data only; no real agent actions or account access.</div>
+  <div id="error" class="notice error" role="alert" hidden></div>
+  <div id="history-notice" class="notice" hidden></div>
+  <main class="workspace" id="workspace">
+    <section class="pane" id="brainstem-pane" aria-labelledby="brainstem-title">
+      <header class="pane-header">
+        <span class="brand" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v16M9 3a4 4 0 0 0-5 4 4 4 0 0 0-1 7 4 4 0 0 0 6 6M15 3a4 4 0 0 1 5 4 4 4 0 0 1 1 7 4 4 0 0 1-6 6M6 8l3 2M18 8l-3 2M5 15l4-1M19 15l-4-1"/></svg></span>
+        <div class="title"><h1 id="brainstem-title">Brainstem</h1><span class="version">v__BRAINSTEM_VERSION__</span></div>
+        <span class="connection"><span id="status-dot" class="dot"></span><span id="status-text">Native Copilot</span></span>
+        <div class="toolbar" aria-label="Brainstem tools">
+          <span class="model" id="model-label" title="The model selected in your Copilot conversation">Copilot model</span>
+          <button class="icon" id="theme" type="button" aria-label="Toggle Canvas theme" title="Toggle Canvas theme"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M20 4l-2 2M6 18l-2 2"/></svg></button>
+          <button class="icon" type="button" data-drawer="memory" aria-label="Open soul and memory" title="Soul and memory"><svg viewBox="0 0 24 24"><path d="M5 3h14v18l-7-4-7 4z"/></svg></button>
+          <button class="icon" type="button" data-drawer="capabilities" aria-label="Open capabilities" title="Capabilities and source"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M7 12h10"/></svg></button>
+          <button class="icon" type="button" data-drawer="activity" aria-label="Open workbench settings" title="Activity and settings"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="8" cy="7" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
+          <button class="icon" id="show-surgeon" type="button" aria-label="Show Brain Surgeon pane" hidden title="Show Brain Surgeon">&#8594;</button>
         </div>
-        <p class="small muted" style="margin-top:8px">Loopback only. Changing servers starts a new workbench conversation.</p>
-      </form>
-      <div class="meta" id="connection-meta"></div>
-    </details>
-
-    <div class="stack">
-      <section class="card">
-        <div class="card-head"><h2>One chat, either role</h2><span class="pill" id="chat-role">Brain Surgeon</span></div>
-        <p class="muted">Say "Brainstem, ..." to use your capabilities, or "Brain Surgeon, ..." to teach and improve them. Shared conversation, soul, and memory. No agent-picker switching.</p>
-        <div class="actions">
-          <button type="button" class="primary" id="setup">Give me my Brainstem</button>
-          <button type="button" id="teach">Teach a new capability</button>
-          <button type="button" id="open-engine" hidden>Open Frontier engine</button>
-        </div>
-        <div class="actions" role="group" aria-label="Talk in this chat">
-          <button type="button" id="talk-brainstem" aria-label="Talk to Brainstem" aria-pressed="false">Brainstem</button>
-          <button type="button" id="talk-surgeon" aria-label="Talk to Brain Surgeon" aria-pressed="true">Brain Surgeon</button>
-        </div>
-        <p class="small muted" style="margin-top:8px">These buttons address the same chat. You can also just type either name.</p>
-      </section>
-
-      <div class="columns">
-        <section class="card">
-          <div class="card-head"><h2>Your capabilities</h2><span class="pill" id="agent-count">Loading skill sources</span></div>
-          <ul class="capabilities" id="capabilities" aria-label="Installed capabilities"></ul>
-          <div class="empty" id="capabilities-empty">
-            <p>Your Copilot skills will appear here.</p>
-            <p class="small">Brain Surgeon can help turn your next real task into a skill you keep.</p>
-          </div>
+      </header>
+      <div class="chat-body" id="brainstem-body">
+        <section class="welcome" id="brainstem-welcome">
+          <h2>Welcome to your Brainstem.</h2>
+          <p>I am your assistant powered by native Copilot. Here is a quick tour to get started:</p>
+          <ul>
+            <li><strong>Chat:</strong> ask questions below and use your learned capabilities.</li>
+            <li><strong>Capabilities:</strong> open the + button above to inspect your skills and their source.</li>
+            <li><strong>Teach:</strong> talk to Brain Surgeon alongside me to build something you can keep.</li>
+          </ul>
+          <p id="shared-description">Both panes share this Copilot conversation, soul, and memory.</p>
+          <button type="button" class="tour" id="setup" aria-label="Give me my Brainstem">New here? Take a guided tour</button>
         </section>
-        <section class="card">
-          <div class="card-head"><h2>See the source</h2><span class="pill">Your files</span></div>
-          <label for="source-file" id="source-label">Copilot skill source</label>
-          <div class="inline-field">
-            <select id="source-file"><option value="">Loading skill sources</option></select>
-            <button type="button" id="show-source" disabled>Show source</button>
-          </div>
-          <p class="small muted" id="source-help" style="margin-top:12px">Standard SKILL.md files, not a Brainstem-only format. Your skills work without this plugin, too.</p>
-        </section>
+        <div class="messages" id="brainstem-messages" role="log" aria-label="Brainstem messages"></div>
+        <div class="thinking" id="brainstem-wait" role="status" hidden>Brainstem is working in Copilot...</div>
       </div>
-
-      <section class="card source" id="source-section" hidden>
-        <div class="card-head"><h2 id="source-title">Agent source</h2><button type="button" id="keep">Keep this capability</button></div>
-        <pre id="source-content" tabindex="0" aria-label="Agent source code"></pre>
-      </section>
-
-      <section class="card" id="profile-section">
-        <div class="card-head"><h2>Soul &amp; memory</h2><button type="button" id="review-profile">Review in chat</button></div>
-        <p class="muted small">Your working instructions and explicitly approved notes. Copilot's own Memory is separate; nothing is saved just because you chatted.</p>
-        <details style="margin-top:12px"><summary>Read my soul</summary><pre id="soul-content" tabindex="0"></pre></details>
-        <div id="memory-notes" class="meta"></div>
-      </section>
-
-      <section class="card">
-        <div class="card-head"><h2>Use your Brainstem</h2><span class="pill" id="execution-kind">Native Copilot</span></div>
-        <form id="run-form">
-          <label for="prompt">What should your Brainstem do?</label>
-          <textarea id="prompt" maxlength="32000" required placeholder="Describe one real task. Your Copilot Brainstem will take it from here."></textarea>
-          <div class="actions end">
-            <span class="small muted" id="run-hint">Continues in Copilot chat with normal approvals.</span>
-            <button type="button" id="cancel" hidden>Stop waiting</button>
-            <button type="submit" class="primary" id="run-button">Send to Copilot</button>
-          </div>
+      <footer class="composer-area">
+        <div class="suggestions" aria-label="Brainstem starter prompts">
+          <button type="button" data-prompt="What can you do?">What can you do?</button>
+          <button type="button" data-prompt="What do you remember? Read our approved notes without saving anything.">What do you remember?</button>
+          <button type="button" data-prompt="What should I do next?">What should I do next?</button>
+        </div>
+        <div class="composer-tools">
+          <button class="text-button" type="button" data-intent="export">Export</button>
+          <button class="text-button" type="button" data-intent="import">Import skill</button>
+          <button class="text-button" id="clear-view" type="button">Clear view</button>
+          <button class="text-button" type="button" data-intent="help">Get help</button>
+        </div>
+        <div class="queue-status" id="brainstem-queue" role="status"></div>
+        <form class="composer" id="brainstem-form">
+          <textarea id="prompt" rows="1" maxlength="31960" required aria-label="Message Brainstem" placeholder="Message Brainstem..."></textarea>
+          <button class="send" id="brainstem-send" type="submit" aria-label="Send to Brainstem" title="Send to Brainstem">&#8593;</button>
         </form>
-      </section>
-
-      <section class="card">
-        <div class="card-head"><h2>Visible work</h2><button type="button" id="new-conversation">Clear activity</button></div>
-        <div class="empty" id="runs-empty"><p>No tool activity yet.</p><p class="small">Native tool events appear here. Copilot chat holds the full requests, approvals, and results.</p></div>
-        <div class="runs" id="runs" aria-live="polite" aria-relevant="additions text"></div>
-      </section>
-
-      <section class="card">
-        <div class="card-head"><h2>Frontier</h2><span class="pill">Optional</span></div>
-        <p class="muted small">Want the separate RAPP Brainstem engine and its Python agents? Connect it here. It is never installed, started, or contacted by default.</p>
-        <div class="actions">
-          <button type="button" id="enable-frontier">Enable Frontier</button>
-          <button type="button" id="return-native" hidden>Return to native Copilot</button>
-          <button type="button" id="refresh-native">Refresh skill sources</button>
+      </footer>
+    </section>
+    <section class="pane surgeon-pane" id="surgeon-pane" aria-labelledby="surgeon-title">
+      <header class="pane-header">
+        <span class="brand surgeon" aria-hidden="true">C</span>
+        <div><div class="title"><h2 id="surgeon-title">Brain Surgeon</h2></div><div class="subtle">GitHub Copilot &middot; same conversation</div></div>
+        <div class="toolbar">
+          <button class="icon" type="button" data-drawer="activity" aria-label="Open native activity" title="Native activity">&#9638;</button>
+          <button class="icon" type="button" id="refresh-chat" aria-label="Refresh conversation" title="Refresh conversation">&#8635;</button>
+          <button class="icon" type="button" id="hide-surgeon" aria-label="Hide Brain Surgeon pane" title="Hide pane, not conversation">&#215;</button>
         </div>
-      </section>
-    </div>
-
-    <footer>
-      Native by default. Model requests and tool permissions stay with GitHub Copilot.
-      The workbench keeps bounded tool-event metadata and your explicitly saved profile in private local files, outside the project.
-      Frontier has its own separate request history when you choose to use it.
-    </footer>
+      </header>
+      <div class="shared-strip" id="shared-strip">One shared chat &middot; no agent-picker switching</div>
+      <div class="chat-body" id="surgeon-body">
+        <section class="welcome surgeon-welcome" id="surgeon-welcome">
+          <h2>Let's build something you can keep.</h2>
+          <p>I help you understand, teach, and improve your Brainstem. I can see what we do together in this same conversation.</p>
+          <button type="button" id="teach" class="tour">Teach a new capability</button>
+        </section>
+        <div class="messages" id="surgeon-messages" role="log" aria-label="Brain Surgeon messages"></div>
+        <div class="thinking" id="surgeon-wait" role="status" hidden>Brain Surgeon is working in Copilot...</div>
+      </div>
+      <footer class="composer-area">
+        <div class="queue-status" id="surgeon-queue" role="status"></div>
+        <form class="composer surgeon-composer" id="surgeon-form">
+          <textarea id="surgeon-prompt" rows="2" maxlength="31960" required aria-label="Message Brain Surgeon" placeholder="Describe what to build or improve..."></textarea>
+          <button class="send" id="surgeon-send" type="submit" aria-label="Send to Brain Surgeon" title="Send to Brain Surgeon">&#8593;</button>
+        </form>
+        <div class="composer-hint">Native tools and approvals &middot; Enter to send, Shift+Enter for a new line</div>
+      </footer>
+    </section>
   </main>
 
-  <dialog id="confirmation" aria-labelledby="confirmation-title">
-    <h2 id="confirmation-title">Run this request?</h2>
-    <p id="confirmation-description"></p>
-    <pre id="confirmation-preview"></pre>
-    <div class="actions end">
-      <button type="button" id="confirmation-cancel">Cancel</button>
-      <button type="button" class="primary" id="confirmation-accept">Run request</button>
-    </div>
+  <dialog id="drawer" aria-labelledby="drawer-title">
+    <header class="dialog-head"><h2 id="drawer-title">Shared workbench</h2><button class="icon" id="close-drawer" type="button" aria-label="Close workbench">&#215;</button></header>
+    <div id="drawer-error" class="notice error" role="alert" hidden></div>
+    <nav class="tabs" role="tablist" aria-label="Workbench sections">
+      <button type="button" role="tab" data-tab="capabilities" id="tab-capabilities" aria-controls="panel-capabilities" aria-selected="true">Capabilities</button>
+      <button type="button" role="tab" data-tab="memory" id="tab-memory" aria-controls="panel-memory" aria-selected="false" tabindex="-1">Soul &amp; memory</button>
+      <button type="button" role="tab" data-tab="activity" id="tab-activity" aria-controls="panel-activity" aria-selected="false" tabindex="-1">Activity</button>
+      <button type="button" role="tab" data-tab="frontier" id="tab-frontier" aria-controls="panel-frontier" aria-selected="false" tabindex="-1">Frontier</button>
+    </nav>
+    <section class="drawer-panel" id="panel-capabilities" role="tabpanel" aria-labelledby="tab-capabilities">
+      <p class="muted small" id="agent-count"></p><ul class="capabilities" id="capabilities"></ul>
+      <p class="empty" id="capabilities-empty">No skill sources discovered yet.</p>
+      <label for="source-file" id="source-label">Copilot skill source</label>
+      <div class="inline-field"><select id="source-file"><option value="">Loading sources</option></select><button id="show-source" type="button">Show source</button></div>
+      <p class="small muted" id="source-help">Your skills are ordinary portable files. Source discovery is not proof that a skill has been exercised.</p>
+      <div id="source-section" hidden><h3 id="source-title"></h3><pre id="source-content" tabindex="0" aria-label="Agent source code"></pre><button type="button" id="keep">Keep this capability</button></div>
+      <details id="source-warnings" hidden><summary>Source inspection notices</summary><div id="source-warning-list"></div></details>
+      <div class="actions"><button type="button" id="refresh-native">Refresh skill sources</button><button type="button" data-intent="import">Import a skill in chat</button></div>
+    </section>
+    <section class="drawer-panel" id="panel-memory" role="tabpanel" aria-labelledby="tab-memory" hidden>
+      <p class="muted small">Both panes use this soul and these explicitly approved notes. Copilot's own Memory is separate.</p>
+      <pre id="soul-content" tabindex="0" aria-label="Shared soul"></pre>
+      <div id="memory-notes"></div><button type="button" id="review-profile">Review in chat</button>
+    </section>
+    <section class="drawer-panel" id="panel-activity" role="tabpanel" aria-labelledby="tab-activity" hidden>
+      <p class="muted small">Real native tool-event metadata. Full requests, approvals, and output remain in Copilot chat.</p>
+      <div class="empty" id="activity-empty">No tool activity yet.</div><div id="activity"></div>
+      <div id="frontier-runs" hidden></div>
+      <div class="actions"><button type="button" id="new-conversation">Clear activity</button><button type="button" id="cancel" hidden>Stop waiting</button></div>
+    </section>
+    <section class="drawer-panel" id="panel-frontier" role="tabpanel" aria-labelledby="tab-frontier" hidden>
+      <p><strong>Optional external engine.</strong> Native Brainstem and Brain Surgeon need no RAPP server.</p>
+      <p class="muted small">Frontier connects a separate engine in the left pane. Brain Surgeon remains in your native Copilot conversation. Nothing is installed or started automatically.</p>
+      <div class="actions"><button type="button" id="enable-frontier">Enable Frontier</button><button type="button" id="return-native" hidden>Return to native Copilot</button></div>
+      <div id="connection" hidden>
+        <form id="connection-form">
+          <label for="base-url">Local Brainstem URL</label>
+          <div class="inline-field"><input id="base-url" type="url" value="http://127.0.0.1:7071" required><button id="connect" type="submit">Connect</button></div>
+        </form>
+        <p id="connection-meta" class="muted small"></p><p id="auth-notice" class="small"></p>
+        <button type="button" id="open-engine">Open Frontier engine</button>
+      </div>
+    </section>
   </dialog>
-
+  <dialog id="confirmation" aria-labelledby="confirmation-title">
+    <h2 id="confirmation-title"></h2><p id="confirmation-description"></p><pre id="confirmation-preview"></pre>
+    <div class="actions end"><button type="button" id="confirmation-cancel">Cancel</button><button type="button" class="primary" id="confirmation-accept">Continue</button></div>
+  </dialog>
   <script>/*__BRAINSTEM_BRIDGE__*/</script>
   <script>
     (() => {
       const host = window.brainstemHost;
       const $ = (id) => document.getElementById(id);
-      let currentApp = null;
+      const names = { brainstem: "Brainstem", "brain-surgeon": "Brain Surgeon" };
+      const paneIds = { brainstem: "brainstem", "brain-surgeon": "surgeon" };
+      const nodes = { brainstem: new Map(), "brain-surgeon": new Map() };
+      const hiddenMessages = new Set();
+      const pending = new Set();
       let current = null;
-      let confirmedAction = null;
       let lastFiles = "";
-      let lastRuns = "";
-      let pending = false;
+      let confirmAction = null;
+      let savedFocus = null;
+      let actionError = null;
 
+      function text(parent, tag, content, className) {
+        const node = document.createElement(tag);
+        node.textContent = content;
+        if (className) node.className = className;
+        parent.append(node);
+        return node;
+      }
       function showError(error) {
-        $("error").textContent = error.message || String(error);
-        $("error").hidden = false;
+        const message = error.message || String(error);
+        actionError = message;
+        $("error").textContent = message; $("error").hidden = false;
+        $("drawer-error").textContent = message; $("drawer-error").hidden = !$("drawer").open;
       }
-
-      function addText(parent, tag, text, className) {
-        const element = document.createElement(tag);
-        element.textContent = text;
-        if (className) element.className = className;
-        parent.append(element);
-        return element;
-      }
-
-      function readiness(health) {
-        if (!health) return ["Not connected", ""];
-        if (health.status === "unauthenticated") return ["Sign-in needed", "warning"];
-        if (health.copilot === "no_access") return ["Copilot access needed", "warning"];
-        if (health.copilot === "pending") return ["Running - auth pending", "warning"];
-        return ["Running", "ready"];
-      }
-
-      function renderFrontier(state) {
-        current = state;
-        const [label, tone] = readiness(state.health);
-        $("status-text").textContent = state.busy ? state.busy.charAt(0).toUpperCase() + state.busy.slice(1) : label;
-        $("status-dot").className = `dot ${tone}`;
-        $("connection-summary").textContent = state.health ? `Connected to ${state.baseUrl}` : "Connect to your local Brainstem";
-        if (document.activeElement !== $("base-url")) $("base-url").value = state.baseUrl;
-        $("connect").textContent = state.health ? "Refresh" : "Connect";
-        $("error").hidden = !state.error;
-        $("error").textContent = state.error || "";
-        const authMessages = {
-          unauthenticated: 'Open Brainstem to sign in, or ask Copilot to guide you. This plugin never reads or copies your credentials.',
-          no_access: "This account needs Copilot access. Open Brainstem to resolve the account issue before running a request.",
-          pending: "Brainstem is running. Copilot authorization will be confirmed on its first model request.",
-        };
-        const authMessage = authMessages[state.health?.status] || authMessages[state.health?.copilot];
-        $("auth-notice").hidden = !authMessage;
-        $("auth-notice").textContent = authMessage || "";
-        $("connection-meta").replaceChildren();
-        if (state.health?.version) addText($("connection-meta"), "span", `Brainstem ${state.health.version}`);
-        if (state.health?.model) addText($("connection-meta"), "span", `Model: ${state.health.model}`);
-        if (state.checkedAt) addText($("connection-meta"), "span", `Checked ${new Date(state.checkedAt).toLocaleTimeString()}`);
-        const agents = state.health?.agents || [];
-        $("capabilities").replaceChildren();
-        agents.forEach((name) => addText($("capabilities"), "li", name));
-        $("agent-count").textContent = `${agents.length} ${agents.length === 1 ? "capability" : "capabilities"}`;
-        $("capabilities-empty").hidden = agents.length > 0;
-        if (state.health && !agents.length) {
-          $("capabilities-empty").firstElementChild.textContent = "No capabilities are installed yet.";
-        }
-        const filesKey = JSON.stringify(state.files);
-        if (lastFiles !== filesKey) {
-          const selected = $("source-file").value;
-          $("source-file").replaceChildren();
-          if (!state.files.length) addText($("source-file"), "option", state.health ? "No agent files" : "Connect to load files").value = "";
-          state.files.forEach((file) => {
-            addText($("source-file"), "option", file.filename).value = file.filename;
-          });
-          if (state.files.some((file) => file.filename === selected)) $("source-file").value = selected;
-          lastFiles = filesKey;
-        }
-        $("source-section").hidden = !state.source;
-        $("source-title").textContent = state.source?.filename || "Agent source";
-        $("source-content").textContent = state.source?.content || "";
-        const isBusy = Boolean(state.busy) || pending;
-        ["connect", "run-button", "new-conversation"].forEach((id) => { $(id).disabled = isBusy; });
-        $("show-source").disabled = isBusy || !$("source-file").value;
-        $("cancel").hidden = state.busy !== "running a capability";
-        $("run-button").disabled = isBusy || !state.health || state.health.status === "unauthenticated" || state.health.copilot === "no_access";
-        $("run-button").textContent = "Review & run";
-        $("source-label").textContent = "Frontier Python agent";
-        $("source-help").textContent = "Portable Python files in the optional RAPP engine. Native mode uses ordinary Copilot skills.";
-        $("new-conversation").textContent = "New conversation";
-        $("runs-empty").firstElementChild.textContent = "No Frontier runs yet.";
-        $("runs-empty").lastElementChild.textContent = "Real engine requests, agent logs, and results appear here.";
-        $("run-hint").textContent = state.busy === "running a capability" ? "Waiting for Brainstem. Agent logs arrive with the result." : "Requests use Brainstem's existing /chat API.";
-        $("runs-empty").hidden = state.runs.length > 0;
-        const runsKey = JSON.stringify(state.runs);
-        if (lastRuns !== runsKey) {
-          const openIds = new Set([...$("runs").querySelectorAll("details[open]")].map((item) => item.dataset.id));
-          $("runs").replaceChildren();
-          [...state.runs].reverse().forEach((run, index) => {
-            const details = document.createElement("details");
-            details.className = "run";
-            details.dataset.id = run.id;
-            details.open = index === 0 || openIds.has(run.id);
-            const summary = document.createElement("summary");
-            addText(summary, "span", run.prompt, "run-prompt");
-            const labels = { running: "Working", done: "Done", error: "Failed", unknown: "Uncertain" };
-            addText(summary, "span", labels[run.status], `run-status ${run.status}`);
-            details.append(summary);
-            const body = document.createElement("div");
-            body.className = "run-body";
-            addText(body, "p", run.prompt, "small muted");
-            if (run.response) {
-              addText(body, "h3", "Result");
-              addText(body, "p", run.response);
-            }
-            if (run.error) addText(body, "p", run.error, "small");
-            if (run.status === "done") {
-              addText(body, "h3", "Agent log");
-              addText(body, "pre", run.agent_logs || "No agent tool calls were reported by Brainstem.");
-            }
-            if (run.model) addText(body, "p", `Answered by ${run.model}`, "small muted");
-            details.append(body);
-            $("runs").append(details);
-          });
-          lastRuns = runsKey;
-        }
-      }
-
-      function renderNative(state) {
-        current = null;
-        $("status-text").textContent = "Native Copilot";
-        $("status-dot").className = "dot ready";
-        $("auth-notice").hidden = true;
-        $("error").hidden = !state.error;
-        $("error").textContent = state.error || "";
-        $("capabilities").replaceChildren();
-        state.capabilities.forEach((skill) => {
-          const item = addText($("capabilities"), "li", skill.name);
-          item.title = `${skill.scope}: ${skill.description}`;
+      function section(name) {
+        document.querySelectorAll("[data-tab]").forEach((tab) => {
+          const selected = tab.dataset.tab === name;
+          tab.setAttribute("aria-selected", String(selected)); tab.tabIndex = selected ? 0 : -1;
+          $(`panel-${tab.dataset.tab}`).hidden = !selected;
         });
-        $("agent-count").textContent = `${state.capabilities.length} skill sources`;
-        $("capabilities-empty").hidden = state.capabilities.length > 0;
-        $("capabilities-empty").firstElementChild.textContent = "No skill sources discovered yet.";
-        $("capabilities-empty").lastElementChild.textContent = "Ask Brain Surgeon to help create a native Copilot skill in this project.";
-        const filesKey = `native:${JSON.stringify(state.capabilities)}`;
-        if (lastFiles !== filesKey) {
-          const selected = $("source-file").value;
-          $("source-file").replaceChildren();
-          if (!state.capabilities.length) addText($("source-file"), "option", "No Copilot skills found").value = "";
-          state.capabilities.forEach((skill) => {
-            addText($("source-file"), "option", `${skill.filename} (${skill.scope})`).value = skill.id;
-          });
-          if (state.capabilities.some((skill) => skill.id === selected)) $("source-file").value = selected;
-          lastFiles = filesKey;
-        }
-        $("source-label").textContent = "Copilot skill source";
-        $("source-help").textContent = "Standard SKILL.md files, not a Brainstem-only format. Source discovery does not claim a skill has been exercised or activated in every open session.";
-        const selectedSkill = state.capabilities.find((skill) => skill.id === $("source-file").value);
-        $("show-source").disabled = !selectedSkill || selectedSkill.sourceAvailable === false;
-        if (selectedSkill?.sourceAvailable === false) {
-          $("source-help").textContent = "This skill is larger than the workbench's source preview limit. Ask Copilot to inspect it with native file tools.";
-        }
-        $("source-section").hidden = !state.source;
-        $("source-title").textContent = state.source?.filename || "Skill source";
-        $("source-content").textContent = state.source?.content || "";
-        $("soul-content").textContent = state.context?.soul || "";
-        $("memory-notes").replaceChildren();
-        const notes = state.context?.notes || [];
-        if (!notes.length) addText($("memory-notes"), "span", "No durable notes saved.");
-        notes.forEach((note) => addText($("memory-notes"), "span", note.text));
-        $("run-button").disabled = pending;
-        $("run-button").textContent = "Send to Copilot";
-        $("cancel").hidden = true;
-        $("run-hint").textContent = "Continues in Copilot chat with normal approvals.";
-        $("new-conversation").textContent = "Clear activity";
-        $("new-conversation").disabled = state.activity.some((item) => item.status === "running");
-        $("runs-empty").hidden = state.activity.length > 0;
-        $("runs-empty").firstElementChild.textContent = "No tool activity yet.";
-        $("runs-empty").lastElementChild.textContent = "Native tool events appear here. Copilot chat holds the full requests, approvals, and results.";
-        const runsKey = `native:${JSON.stringify(state.activity)}`;
-        if (lastRuns !== runsKey) {
-          $("runs").replaceChildren();
-          [...state.activity].reverse().forEach((event) => {
-            const row = document.createElement("div");
-            row.className = "run";
-            addText(row, "h3", event.tool);
-            const labels = { running: "Running", done: "Completed", error: "Failed", unknown: "Completion unknown" };
-            addText(row, "span", labels[event.status], `run-status ${event.status}`);
-            addText(row, "p", new Date(event.startedAt).toLocaleTimeString(), "small muted");
-            $("runs").append(row);
-          });
-          lastRuns = runsKey;
-        }
       }
-
-      function render(state) {
-        currentApp = state;
-        const surgeon = state.role !== "brainstem";
-        $("chat-role").textContent = surgeon ? "Brain Surgeon" : "Brainstem";
-        $("talk-brainstem").setAttribute("aria-pressed", String(!surgeon));
-        $("talk-surgeon").setAttribute("aria-pressed", String(surgeon));
-        $("talk-brainstem").classList.toggle("primary", !surgeon);
-        $("talk-surgeon").classList.toggle("primary", surgeon);
-        const frontier = state.mode === "frontier";
-        $("connection").hidden = !frontier;
-        $("open-engine").hidden = !frontier;
-        $("profile-section").hidden = frontier;
-        $("enable-frontier").hidden = frontier;
-        $("return-native").hidden = !frontier;
-        $("refresh-native").hidden = frontier;
-        $("execution-kind").textContent = frontier ? "Frontier engine" : "Native Copilot";
-        $("source-warnings").hidden = frontier || !state.warnings.length;
-        $("source-warning-list").replaceChildren();
-        state.warnings.forEach((warning) => addText($("source-warning-list"), "p", warning));
-        if (frontier) renderFrontier(state.frontier);
-        else renderNative(state);
+      function openDrawer(name) {
+        section(name);
+        if (!$("drawer").open) { savedFocus = document.activeElement; $("drawer").showModal(); }
+        $(`tab-${name}`).focus();
       }
-
+      function closeDrawer() {
+        $("drawer").close();
+        savedFocus?.focus();
+      }
+      function confirm(title, description, preview, label, action) {
+        $("confirmation-title").textContent = title;
+        $("confirmation-description").textContent = description;
+        $("confirmation-preview").textContent = preview; $("confirmation-preview").hidden = !preview;
+        $("confirmation-accept").textContent = label;
+        confirmAction = action; $("confirmation").showModal(); $("confirmation-cancel").focus();
+      }
       async function act(action, args = {}) {
+        actionError = null;
         try {
-          return await host.request(action, args);
+          const result = await host.request(action, args);
+          return result;
         } catch (error) {
-          if (currentApp) {
-            currentApp.error = error.message || String(error);
-            if (currentApp.mode === "frontier" && currentApp.frontier) currentApp.frontier.error = currentApp.error;
-          }
           showError(error);
           return null;
         }
       }
+      async function intent(value) {
+        const result = await act("ask", { intent: value });
+        if (result) {
+          if ($("drawer").open) closeDrawer();
+          $("surgeon-queue").textContent = "Sent to this same Copilot conversation.";
+        }
+      }
+      function frontierMessages(state) {
+        return (state.frontier?.runs || []).flatMap((run) => {
+          const entries = [{ id: `frontier-user:${run.id}`, author: "user", role: "brainstem", content: run.prompt }];
+          if (run.response || run.error) entries.push({
+            id: `frontier-result:${run.id}`, author: "assistant", role: "brainstem",
+            content: run.response || run.error, incomplete: run.status === "unknown",
+          });
+          return entries;
+        });
+      }
+      function renderMessages(role, messages) {
+        const prefix = paneIds[role];
+        const scroll = $(`${prefix}-body`), log = $(`${prefix}-messages`);
+        const stick = scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight < 90;
+        const visible = messages.filter((message) => message.role === role && !hiddenMessages.has(message.id));
+        const keep = new Set(visible.map((message) => message.id));
+        for (const [id, node] of nodes[role]) if (!keep.has(id)) { node.remove(); nodes[role].delete(id); }
+        visible.forEach((message, index) => {
+          let node = nodes[role].get(message.id);
+          if (!node) {
+            node = document.createElement("article"); node.className = `message ${message.author}`;
+            const bubble = text(node, "div", "", "bubble");
+            text(bubble, "div", "", "bubble-text");
+            text(node, "div", "", "message-meta");
+            nodes[role].set(message.id, node);
+          }
+          const body = node.querySelector(".bubble-text");
+          if (body.textContent !== message.content) body.textContent = message.content;
+          const note = message.incomplete ? "Incomplete response - see Copilot chat" :
+            message.truncated ? "Display shortened - full text is in Copilot chat" :
+            message.streaming ? "Responding..." : message.author === "user" ? "You" : names[role];
+          node.querySelector(".message-meta").textContent = note;
+          if (log.children[index] !== node) log.insertBefore(node, log.children[index] || null);
+        });
+        $(`${prefix}-welcome`).hidden = visible.length > 0;
+        if (stick) requestAnimationFrame(() => { scroll.scrollTop = scroll.scrollHeight; });
+      }
+      function render(state) {
+        if (!state.conversation || !Array.isArray(state.conversation.messages)) throw new Error("Reload the updated plugin to enable the split chat view.");
+        current = state;
+        const frontier = state.mode === "frontier", engine = state.frontier;
+        const conversation = state.conversation;
+        $("shared-description").textContent = frontier ? "Frontier uses your explicitly connected external engine. Brain Surgeon stays in Copilot." : "Both panes share this Copilot conversation, soul, and memory.";
+        $("shared-strip").textContent = frontier ? "Brain Surgeon stays in Copilot - Frontier is separate" : "One shared chat - no agent-picker switching";
+        renderMessages("brainstem", frontier ? frontierMessages(state) : conversation.messages);
+        renderMessages("brain-surgeon", conversation.messages);
+        $("model-label").textContent = (frontier ? engine?.health?.model : conversation.model) || "Copilot model";
+        $("status-text").textContent = frontier ? (engine?.health ? "Frontier connected" : "Frontier not connected") : "Native Copilot";
+        $("status-dot").className = frontier && !engine?.health ? "dot warning" : "dot";
+        $("brainstem-wait").hidden = frontier ? !engine?.busy : !(conversation.busy && conversation.activeRole === "brainstem");
+        $("surgeon-wait").hidden = !(conversation.busy && conversation.activeRole === "brain-surgeon");
+        const error = actionError || state.error || conversation.error || (frontier && engine?.error);
+        $("error").hidden = !error; $("error").textContent = error || "";
+        $("drawer-error").hidden = !error; $("drawer-error").textContent = error || "";
+        $("history-notice").hidden = !state.historyError && !conversation.truncated;
+        $("history-notice").textContent = state.historyError || (conversation.truncated ? "Showing recent messages. The full shared conversation remains in Copilot chat." : "");
+        $("brainstem-send").disabled = pending.has("brainstem") || (frontier && (!engine?.health || engine.busy || engine.health.status === "unauthenticated" || engine.health.copilot === "no_access"));
+        $("surgeon-send").disabled = pending.has("brain-surgeon");
+        $("brainstem-send").title = frontier ? "Review and run in the optional Frontier engine" : "Send to Brainstem";
 
-      function confirm(title, description, preview, label, action) {
-        $("confirmation-title").textContent = title;
-        $("confirmation-description").textContent = description;
-        $("confirmation-preview").textContent = preview;
-        $("confirmation-preview").hidden = !preview;
-        $("confirmation-accept").textContent = label;
-        confirmedAction = action;
-        $("confirmation").showModal();
-        $("confirmation-cancel").focus();
+        const sources = frontier ? engine?.files || [] : state.capabilities;
+        $("capabilities").replaceChildren();
+        const labels = frontier ? engine?.health?.agents || [] : state.capabilities.map((item) => item.name);
+        labels.forEach((name) => text($("capabilities"), "li", name));
+        $("agent-count").textContent = frontier ? `${labels.length} Frontier capabilities` : `${sources.length} skill sources`;
+        $("capabilities-empty").hidden = sources.length > 0;
+        $("source-label").textContent = frontier ? "Frontier Python agent" : "Copilot skill source";
+        const key = `${state.mode}:${JSON.stringify(sources)}`;
+        if (key !== lastFiles) {
+          const selected = $("source-file").value;
+          $("source-file").replaceChildren();
+          if (!sources.length) text($("source-file"), "option", "No source files").value = "";
+          sources.forEach((file) => { text($("source-file"), "option", file.filename).value = frontier ? file.filename : file.id; });
+          if (sources.some((file) => (frontier ? file.filename : file.id) === selected)) $("source-file").value = selected;
+          lastFiles = key;
+        }
+        const selected = sources.find((file) => (frontier ? file.filename : file.id) === $("source-file").value);
+        $("show-source").disabled = !selected || selected.sourceAvailable === false || Boolean(frontier && engine?.busy);
+        const source = frontier ? engine?.source : state.source;
+        $("source-section").hidden = !source;
+        $("source-title").textContent = source?.filename || "";
+        $("source-content").textContent = source?.content || "";
+        $("source-warnings").hidden = !state.warnings.length;
+        $("source-warning-list").replaceChildren();
+        state.warnings.forEach((warning) => text($("source-warning-list"), "p", warning, "small muted"));
+        $("soul-content").textContent = state.context?.soul || "";
+        $("memory-notes").replaceChildren();
+        const notes = state.context?.notes || [];
+        if (!notes.length) text($("memory-notes"), "p", "No durable notes saved.", "small muted");
+        notes.forEach((note) => text($("memory-notes"), "p", note.text));
+        $("activity").replaceChildren();
+        [...state.activity].reverse().forEach((event) => {
+          const row = text($("activity"), "div", "", "activity-row");
+          text(row, "span", event.tool);
+          text(row, "span", ({ done: "Completed", running: "Running", error: "Failed", unknown: "Unknown" })[event.status]);
+        });
+        $("activity-empty").hidden = state.activity.length > 0;
+        $("frontier-runs").hidden = !frontier;
+        $("frontier-runs").replaceChildren();
+        if (frontier) {
+          if (!engine.runs.length) text($("frontier-runs"), "p", "No Frontier runs yet.", "empty");
+          engine.runs.forEach((run) => {
+            text($("frontier-runs"), "h3", run.prompt);
+            text($("frontier-runs"), "pre", run.agent_logs || run.error || (run.status === "done" ? "No agent tool calls were reported." : "Waiting for the engine."));
+          });
+        }
+        $("new-conversation").textContent = frontier ? "New Frontier conversation" : "Clear activity";
+        $("new-conversation").disabled = Boolean(engine?.busy) || state.activity.some((event) => event.status === "running");
+        $("cancel").hidden = !frontier || engine?.busy !== "running a capability";
+        $("enable-frontier").hidden = frontier; $("return-native").hidden = !frontier; $("connection").hidden = !frontier;
+        if (frontier) {
+          if (document.activeElement !== $("base-url")) $("base-url").value = engine.baseUrl;
+          $("connect").textContent = engine.health ? "Refresh connection" : "Connect";
+          $("connect").disabled = Boolean(engine.busy);
+          $("connection-meta").textContent = engine.health ? `Connected to ${engine.baseUrl}` : "No external engine is connected.";
+          $("auth-notice").textContent = engine.health?.status === "unauthenticated" ? "Sign in through the engine's own UI." :
+            engine.health?.copilot === "pending" ? "Engine running; Copilot authorization is pending its first request." :
+            engine.health?.copilot === "no_access" ? "This account needs Copilot access." : "";
+        }
+      }
+      async function send(role, prompt) {
+        if (!prompt.trim()) return showError(new Error("Enter a message first."));
+        if (pending.has(role)) return showError(new Error("A message is already being queued."));
+        const recipient = window.brainstemRoleForPrompt(prompt) || role;
+        const external = role === "brainstem" && recipient === "brainstem" && current?.mode === "frontier";
+        const perform = async () => {
+          $(`${paneIds[role]}-queue`).textContent = "";
+          pending.add(role); if (current) render(current);
+          const result = await act(external ? "frontier_run" : "native_chat", external ? { prompt } : { role: recipient, prompt });
+          pending.delete(role);
+          if (current) render(current);
+          if (result) {
+            $(role === "brainstem" ? "prompt" : "surgeon-prompt").value = "";
+            $(`${paneIds[role]}-queue`).textContent = external ? "The Frontier result appears above." : "Sent to the same Copilot conversation. Approvals remain in native chat.";
+          }
+        };
+        if (external) confirm("Run in the optional Frontier engine?", "This is a separate RAPP engine. Its agents may act on files or connected accounts and use additional model calls. Native confirmation is still required.", prompt, "Run request", perform);
+        else await perform();
       }
 
-      $("confirmation-cancel").addEventListener("click", () => {
-        confirmedAction = null;
-        $("confirmation").close();
-      });
-      $("confirmation").addEventListener("cancel", () => { confirmedAction = null; });
-      $("confirmation-accept").addEventListener("click", async () => {
-        const action = confirmedAction;
-        confirmedAction = null;
-        $("confirmation").close();
-        if (action) await action();
-      });
-      $("connection-form").addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const connect = () => act("connect", { baseUrl: $("base-url").value });
-        if (current?.runs.length && $("base-url").value.replace(/\/$/, "") !== current.baseUrl) {
-          confirm("Connect to a different Brainstem?", "This starts a new workbench conversation. It does not delete agents or Brainstem memories.", "", "Connect", connect);
-        } else {
-          await connect();
-        }
-      });
-      $("source-file").addEventListener("change", () => {
-        const selected = currentApp?.capabilities.find((skill) => skill.id === $("source-file").value);
-        $("show-source").disabled = Boolean(current?.busy) || !$("source-file").value ||
-          (currentApp?.mode === "copilot" && selected?.sourceAvailable === false);
-        if (currentApp?.mode === "copilot") {
-          $("source-help").textContent = selected?.sourceAvailable === false ?
-            "This skill is larger than the workbench's source preview limit. Ask Copilot to inspect it with native file tools." :
-            "Standard SKILL.md files, not a Brainstem-only format. Your skills work without this plugin, too.";
-        }
-      });
-      $("show-source").addEventListener("click", () => act("source", currentApp?.mode === "frontier" ?
-        { filename: $("source-file").value } : { id: $("source-file").value }));
-      $("run-form").addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const prompt = $("prompt").value.trim();
-        if (!prompt) return showError(new Error("Enter a request before running a capability."));
-        if (currentApp?.mode !== "frontier") {
-          if (pending) return showError(new Error("A request is already being queued in Copilot."));
-          pending = true;
-          if (currentApp) render(currentApp);
-          const result = await act("native_run", { prompt });
-          pending = false;
-          if (currentApp) render(currentApp);
-          if (result) {
-            $("queued-notice").textContent = "Sent to Copilot chat. Continue there for any approvals and the result.";
-            $("queued-notice").hidden = false;
-          }
-          return;
-        }
-        confirm("Run this request?", "Brainstem may execute installed agent code using your local files and connected accounts. Only proceed with agents you trust. A model request can consume your Copilot allowance.", prompt, "Run request", async () => {
-          pending = true;
-          if (currentApp) render(currentApp);
-          await act("frontier_run", { prompt });
-          pending = false;
-          if (currentApp) render(currentApp);
+      document.querySelectorAll("[data-drawer]").forEach((button) => button.addEventListener("click", () => openDrawer(button.dataset.drawer)));
+      document.querySelectorAll("[data-tab]").forEach((button) => {
+        button.addEventListener("click", () => section(button.dataset.tab));
+        button.addEventListener("keydown", (event) => {
+          if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+          event.preventDefault();
+          const tabs = [...document.querySelectorAll("[data-tab]")];
+          const next = tabs[(tabs.indexOf(button) + (event.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+          section(next.dataset.tab); next.focus();
         });
       });
-      $("cancel").addEventListener("click", () => act("cancel"));
-      $("new-conversation").addEventListener("click", () => {
-        const frontier = currentApp?.mode === "frontier";
-        confirm(frontier ? "Start a new conversation?" : "Clear workbench activity?",
-          frontier ? "Clear this workbench's Frontier requests and results. Engine memories and agent files are not changed." :
-            "Clear this workbench's tool-event metadata. Your Copilot chat, soul, memory, and skills are not changed.",
-          "", frontier ? "Start new" : "Clear activity", () => act("new"));
-      });
-      $("setup").addEventListener("click", () => act("ask", { intent: "setup" }));
-      $("teach").addEventListener("click", () => act("ask", { intent: "teach" }));
-      $("talk-brainstem").addEventListener("click", () => act("ask", { intent: "brainstem" }));
-      $("talk-surgeon").addEventListener("click", () => act("ask", { intent: "brain-surgeon" }));
-      $("keep").addEventListener("click", () => act("ask", { intent: "keep",
-        filename: currentApp?.mode === "frontier" ? current?.source?.filename : currentApp?.source?.filename }));
-      $("open-engine").addEventListener("click", () => act("open"));
-      $("review-profile").addEventListener("click", () => act("ask", { intent: "soul" }));
-      $("refresh-native").addEventListener("click", () => act("refresh"));
-      $("enable-frontier").addEventListener("click", () => confirm(
-        "Enable the optional Frontier engine?",
-        "Native Copilot needs no server. Frontier connects a separate RAPP Brainstem that can run Python agents and make additional model requests. Enabling it does not install or start anything.",
-        "", "Enable Frontier", () => act("mode", { mode: "frontier" }),
-      ));
-      $("return-native").addEventListener("click", () => act("mode", { mode: "copilot" }));
-      if (!host) {
-        showError(new Error("Open this workbench through the Brainstem Copilot extension or the documented preview server."));
-        return;
+      $("close-drawer").addEventListener("click", closeDrawer);
+      $("theme").addEventListener("click", () => document.documentElement.setAttribute("data-theme", document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
+      $("hide-surgeon").addEventListener("click", () => { $("surgeon-pane").hidden = true; $("workspace").classList.add("surgeon-hidden"); $("show-surgeon").hidden = false; });
+      $("show-surgeon").addEventListener("click", () => { $("surgeon-pane").hidden = false; $("workspace").classList.remove("surgeon-hidden"); $("show-surgeon").hidden = true; $("surgeon-prompt").focus(); });
+      for (const [role, form, field] of [["brainstem", "brainstem-form", "prompt"], ["brain-surgeon", "surgeon-form", "surgeon-prompt"]]) {
+        $(form).addEventListener("submit", (event) => { event.preventDefault(); send(role, $(field).value); });
+        $(field).addEventListener("keydown", (event) => {
+          if (event.key === "Enter" && !event.shiftKey && !event.isComposing) { event.preventDefault(); $(form).requestSubmit(); }
+        });
       }
+      document.querySelectorAll("[data-prompt]").forEach((button) => button.addEventListener("click", () => send("brainstem", button.dataset.prompt)));
+      document.querySelectorAll("[data-intent]").forEach((button) => button.addEventListener("click", () => intent(button.dataset.intent)));
+      $("setup").addEventListener("click", () => intent("setup"));
+      $("teach").addEventListener("click", () => intent("teach"));
+      $("review-profile").addEventListener("click", () => intent("soul"));
+      $("refresh-native").addEventListener("click", () => act("refresh"));
+      $("refresh-chat").addEventListener("click", () => act("refresh"));
+      $("source-file").addEventListener("change", () => { if (current) render(current); });
+      $("show-source").addEventListener("click", () => act("source", current.mode === "frontier" ? { filename: $("source-file").value } : { id: $("source-file").value }));
+      $("keep").addEventListener("click", async () => {
+        const result = await act("ask", { intent: "keep", filename: (current.mode === "frontier" ? current.frontier.source : current.source)?.filename });
+        if (result) closeDrawer();
+      });
+      $("clear-view").addEventListener("click", () => confirm("Clear this Brainstem view?", "This only hides the currently displayed left-pane messages. It does not delete or reset the shared Copilot conversation, agent files, or memory.", "", "Clear view", () => {
+        const messages = current.mode === "frontier" ? frontierMessages(current) : current.conversation.messages;
+        messages.filter((message) => message.role === "brainstem").forEach((message) => hiddenMessages.add(message.id));
+        render(current);
+      }));
+      $("new-conversation").addEventListener("click", () => confirm(current.mode === "frontier" ? "Start a new Frontier conversation?" : "Clear activity?",
+        current.mode === "frontier" ? "Reset only the external engine's workbench history. Your native Copilot chat, soul, and memory are unchanged." : "Clear only the workbench tool-event metadata, not either role's conversation.",
+        "", current.mode === "frontier" ? "Start new" : "Clear activity", () => act("new")));
+      $("enable-frontier").addEventListener("click", () => confirm("Enable optional Frontier?", "Native Copilot needs no RAPP server. This explicitly enables a separate engine in the left pane; it does not install or start one.", "", "Enable Frontier", () => act("mode", { mode: "frontier" })));
+      $("return-native").addEventListener("click", () => act("mode", { mode: "copilot" }));
+      $("connection-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const connect = () => act("connect", { baseUrl: $("base-url").value });
+        if (current.frontier.runs.length && $("base-url").value.replace(/\/$/, "") !== current.frontier.baseUrl) confirm("Change Frontier engine?", "This starts a new external-engine conversation, not a new native Copilot chat.", "", "Connect", connect);
+        else connect();
+      });
+      $("open-engine").addEventListener("click", () => act("open"));
+      $("cancel").addEventListener("click", () => act("cancel"));
+      $("confirmation-cancel").addEventListener("click", () => { confirmAction = null; $("confirmation").close(); });
+      $("confirmation").addEventListener("cancel", () => { confirmAction = null; });
+      $("confirmation-accept").addEventListener("click", async () => { const action = confirmAction; confirmAction = null; $("confirmation").close(); if (action) await action(); });
+      if (!host) return showError(new Error("Open this Canvas through Brainstem Copilot or its documented preview."));
       $("preview-notice").hidden = host.mode !== "preview";
       host.subscribe(render);
       host.request("state").then(render).catch(showError);

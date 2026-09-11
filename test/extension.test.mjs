@@ -11,6 +11,7 @@ async function fixture(t) {
   let views = 0;
   let viewClosed = 0;
   let dispatch;
+  let eventNumber = 0;
   const listeners = new Map();
   const messages = [];
   const logs = [];
@@ -21,6 +22,13 @@ async function fixture(t) {
     capabilities: { ui: { elicitation: true } },
     ui: { confirm: async () => { approvals++; return allowed; } },
     rpc: {
+      eventLog: { read: async (params) => {
+        assert.equal(params.agentScope, "primary");
+        assert.equal(params.includeEphemeral, false);
+        assert.equal(params.direction, "backward");
+        assert(params.types.every((name) => !name.includes("reasoning")));
+        return { events: [], hasMore: false, cursor: "tail", cursorStatus: "ok" };
+      } },
       metadata: { snapshot: async () => { throw new Error("A running native tool must not re-enter session metadata RPC."); } },
       canvas: { open: async ({ instanceId }) => registered.canvases[0].open({ instanceId }) },
       tools: { execute: async ({ name, arguments: args }) => {
@@ -75,7 +83,9 @@ async function fixture(t) {
     denyPipeline(value) { pipelineDenied = value; },
     dispatch: (...args) => dispatch(...args),
     invoke: async (name, args = {}) => JSON.parse(await registered.tools.find((item) => item.name === name).handler(args)),
-    emit: (name, event) => listeners.get(name)(event),
+    emit: (name, event) => listeners.get(name)({
+      id: `event-${++eventNumber}`, type: name, timestamp: new Date(1_780_000_000_000 + eventNumber).toISOString(), ...event,
+    }),
   };
 }
 
@@ -187,4 +197,44 @@ test("addressing either role retains the joined session and never selects anothe
   assert.equal(f.extension.session, session);
   assert.equal(f.messages.length, 0);
   assert.equal(f.registered.hooks, undefined);
+});
+
+test("opening the Canvas restores filtered native history and streams subsequent replies", async (t) => {
+  const f = await fixture(t);
+  f.session.rpc.eventLog.read = async () => ({
+    events: [
+      { id: "old-user", type: "user.message", timestamp: "2026-01-01T00:00:00Z", data: { messageId: "u", content: "Brainstem, earlier task", interactionId: "old" } },
+      { id: "old-turn", type: "assistant.turn_start", timestamp: "2026-01-01T00:00:01Z", data: { turnId: "0", interactionId: "old" } },
+      { id: "old-answer", type: "assistant.message", timestamp: "2026-01-01T00:00:02Z", data: { messageId: "a", content: "Earlier answer", phase: "final_answer", interactionId: "old", reasoningText: "NEVER_RENDER" } },
+    ], hasMore: true,
+  });
+  const opened = await f.invoke("brainstem_open");
+  assert.equal(opened.historyLoaded, true);
+  assert.equal(opened.nativeRepliesShown.brainstem, 1);
+  let state = await f.dispatch("state");
+  assert.equal(state.conversation.messages.length, 2);
+  assert.equal(state.conversation.messages[1].role, "brainstem");
+  assert.equal(state.conversation.truncated, true);
+  f.emit("user.message", { data: { messageId: "new-u", content: "Brain Surgeon, improve it", interactionId: "new" } });
+  f.emit("assistant.turn_start", { data: { turnId: "0", interactionId: "new" } });
+  f.emit("assistant.message_start", { data: { messageId: "new-a", phase: "final" } });
+  f.emit("assistant.message_delta", { data: { messageId: "new-a", deltaContent: "An improvement" } });
+  f.emit("assistant.message", { data: { messageId: "new-a", content: "An improvement", interactionId: "new" } });
+  await f.extension.idle();
+  state = await f.dispatch("state");
+  assert.equal(state.conversation.messages.length, 4);
+  assert.equal(state.conversation.messages.at(-1).role, "brain-surgeon");
+  assert(!JSON.stringify(state).includes("NEVER_RENDER"));
+  assert([...f.stored.values()].every((value) => !JSON.stringify(value).includes("Earlier answer")));
+});
+
+test("history errors are visible and do not pretend that an empty history was restored", async (t) => {
+  const f = await fixture(t);
+  f.session.rpc.eventLog.read = async () => { throw new Error("Native history unavailable"); };
+  const opened = await f.invoke("brainstem_open");
+  assert.equal(opened.historyLoaded, false);
+  assert.match((await f.dispatch("state")).historyError, /Native history unavailable/);
+  f.session.rpc.eventLog.read = async () => ({ events: [], hasMore: false });
+  await f.dispatch("refresh");
+  assert.equal((await f.dispatch("state")).historyError, null);
 });

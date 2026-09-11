@@ -9,8 +9,8 @@
   "plugins": [
     {
       "name": "brainstem-copilot",
-      "description": "Talk to Brainstem or Brain Surgeon by name in the same Copilot chat. Shared context, no agent-picker switching, and no Brainstem server.",
-      "version": "0.2.0",
+      "description": "Brainstem and Brain Surgeon side by side in a split chat Canvas, sharing one native Copilot conversation. No Brainstem server required.",
+      "version": "0.3.0",
       "source": "./"
     }
   ]

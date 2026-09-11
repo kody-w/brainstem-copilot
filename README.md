@@ -62,9 +62,11 @@ role. You can ask both to contribute in one response, too.
 
 Brain Surgeon leads the teaching loop; Brainstem uses the capabilities.
 They are two directly addressable roles, not two chats or two picker profiles.
-The Canvas's **Brainstem** and **Brain Surgeon** buttons send those same
-requests into your current chat. They do not select another agent or start
-another session. The matching native skills can also be invoked in an
+The Canvas has **Brainstem on the left** and **Brain Surgeon on the right**.
+Each pane has its own message box, but both send into this same native
+Copilot conversation. They do not select another agent or start another
+session. An explicit role name in a message overrides the box you typed in.
+The matching native skills can also be invoked in an
 ordinary Copilot chat without requiring the Canvas.
 
 The app's normal approvals still apply. Organization policy may restrict
@@ -126,15 +128,31 @@ separate backend.
 
 ## What the workbench shows
 
-- **Capabilities and source:** ordinary `SKILL.md` files from this plugin,
+- **Split chat:** compact headers, a Brainstem welcome tour and starter prompts,
+  two scrollable message panes, and message boxes anchored at the bottom.
+  Actual user messages and streaming/final Copilot replies appear in the
+  appropriate pane. The model label reflects the native conversation; model
+  selection stays with the Copilot app.
+- **Capabilities and source drawer:** ordinary `SKILL.md` files from this plugin,
   the current project's `.github/skills`, and your `~/.copilot/skills`.
-- **Soul and memory:** inspect your working instructions and approved notes;
+- **Soul and memory drawer:** inspect your working instructions and approved notes;
   request changes in chat through the native tool approval flow.
-- **Chat role:** address Brainstem or Brain Surgeon with one click or by name;
-  this changes neither the session nor the selected native agent profile.
-- **Visible work:** native tool-event names, status, and timing. Copilot chat
+- **Visible work drawer:** native tool-event names, status, and timing. Copilot chat
   remains the authoritative record of prompts, approvals, output, and results.
-- **Frontier:** an explicit optional switch for connecting an external engine.
+- **Frontier settings:** an explicit optional switch for connecting an external
+  engine in the left pane. Brain Surgeon remains in native Copilot.
+
+Import, export, help, and the guided tour continue through the same native
+chat and its normal approvals. **Clear view** only hides displayed Brainstem
+messages; it does not delete the shared conversation or memory. Hiding and
+reopening the Surgeon pane likewise preserves its conversation.
+
+After updating an already-loaded plugin, ask Copilot in your current chat:
+
+> Reload extensions and open the Brainstem Canvas.
+
+This loads the updated view and restores its recent messages from the same
+native conversation; it does not require switching roles into separate chats.
 
 Source discovery does not prove a skill has been exercised or loaded into
 every already-open session. The Brain Surgeon workflow exercises newly taught
@@ -170,7 +188,8 @@ explicit scope decision.
 
 ## Optional Frontier engine
 
-Choose **Enable Frontier** in the workbench, or explicitly ask for the
+Open the workbench settings drawer and choose **Frontier -> Enable Frontier**,
+or explicitly ask for the
 `brainstem-frontier` skill. Then connect your existing RAPP Brainstem, normally
 at `http://127.0.0.1:7071`.
 
@@ -209,6 +228,15 @@ arguments or output. The most recently addressed role is saved with that
 session's metadata; older activity files remain supported. Frontier stores a separate bounded conversation history
 when used. Reopening a workbench defaults to native mode; it does not silently
 restore or probe Frontier.
+
+The split chat reads a bounded recent history page from the current native
+session and observes its live user/assistant events. This display projection
+is kept in memory, not saved as another transcript. Hidden skill injections,
+subagent messages, reasoning fields, transformed prompts, and attachment
+payloads are not projected into the panes. Long replies and older history are
+visibly marked when shortened; the full conversation stays in Copilot chat.
+Queued requests are correlated to their originating role rather than being
+assigned to whichever box was used most recently.
 
 Profile notes are not encrypted. Files are created with owner-only modes on
 POSIX systems; Windows uses the local user's inherited ACLs. Do not save

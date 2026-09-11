@@ -26,6 +26,9 @@ the same soul, approved notes, skill sources, and native tools.
    `brainstem_context` for the user's soul, approved notes, and skill sources.
    If extensions are unavailable, continue using normal native Copilot tools;
    do not invent a tool or make the Canvas a prerequisite.
+   The Canvas is a split chat: Brainstem on the left, Brain Surgeon on the
+   right, both observing this same native conversation. Capabilities, source,
+   soul, memory, activity, and optional Frontier settings are in toolbar drawers.
 2. Brain Surgeon leads onboarding unless the user explicitly addresses
    Brainstem. Explain briefly: "You can talk to Brainstem or Brain Surgeon
    right here by name. We share this conversation. No server or IDE is required."

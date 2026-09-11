@@ -1,7 +1,7 @@
 {
   "name": "brainstem-copilot",
-  "version": "0.2.0",
-  "description": "One Copilot chat with both Brainstem and Brain Surgeon. Address either by name with shared context, soul, memory, and capabilities. No picker switching or Brainstem server. Frontier is optional.",
+  "version": "0.3.0",
+  "description": "A split chat Canvas: Brainstem on the left, Brain Surgeon on the right, one native Copilot conversation underneath. Real messages, shared context and capabilities, optional Frontier, no Brainstem server required.",
   "author": {
     "name": "RAPP Brainstem contributors"
   },

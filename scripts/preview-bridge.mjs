@@ -14,15 +14,26 @@ function previewBridge() {
     role: "brain-surgeon",
     context: { soul: "# My Brainstem\n\nUse native Copilot tools. Teach by doing. Ask before saving notes.", customSoul: false, notes: [] },
     capabilities: skills, warnings: [], source: null, activity: [], error: null, frontier: null,
+    conversation: { messages: [], busy: false, activeRole: "brain-surgeon", model: null, error: null, truncated: false },
+    historyError: null,
   };
   let frontierRequests = 0;
   let rejectNext = null;
+  let messageNumber = 0;
   const snapshot = () => structuredClone(state);
   const emit = () => { for (const listener of listeners) listener(snapshot()); };
   const frontier = () => {
     if (state.mode !== "frontier") throw new Error("Frontier is off.");
     return state.frontier;
   };
+  function previewChat(role, prompt) {
+    state.role = role;
+    state.conversation.messages.push(
+      { id: `preview-user-${++messageNumber}`, author: "user", role, content: prompt },
+      { id: `preview-answer-${messageNumber}`, author: "assistant", role, content: "Preview reply only. In the installed plugin, your native Copilot response appears here in the same shared conversation." },
+    );
+    emit();
+  }
   window.brainstemHost = {
     mode: "preview",
     subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
@@ -40,12 +51,19 @@ function previewBridge() {
           prompts.push({ intent: args.intent, filename: args.filename });
           if (["brainstem", "brain-surgeon"].includes(args.intent)) state.role = args.intent;
           if (["setup", "teach"].includes(args.intent)) state.role = "brain-surgeon";
-          emit();
+          previewChat(state.role, `Preview request: ${args.intent}`);
           return { queued: true };
         case "native_run":
           if (state.mode !== "copilot") throw new Error("Return to native Copilot.");
           prompts.push({ prompt: args.prompt });
+          previewChat(window.brainstemRoleForPrompt(args.prompt) || state.role, args.prompt);
           return { queued: true };
+        case "native_chat": {
+          const role = window.brainstemRoleForPrompt(args.prompt) || args.role;
+          prompts.push({ role, prompt: args.prompt });
+          previewChat(role, args.prompt);
+          return { queued: true };
+        }
         case "mode":
           state.mode = args.mode;
           if (!state.frontier && args.mode === "frontier") {
@@ -109,6 +127,10 @@ function previewBridge() {
     empty() {
       state.capabilities = [];
       state.source = null;
+      emit();
+    },
+    messages(messages) {
+      state.conversation.messages = messages;
       emit();
     },
   };
