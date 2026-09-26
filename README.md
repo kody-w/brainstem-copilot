@@ -1,5 +1,9 @@
 # Brainstem Copilot
 
+<!-- rapp1:network-header:start -->
+[![RAPP/1](https://kody-w.github.io/rapp-hive-public/portfolio/badges/brainstem-copilot.svg)](https://github.com/kody-w/rapp-hive-public/blob/main/portfolio/repos/brainstem-copilot.md) · **New to RAPP?** [Start here: get your Brainstem →](https://github.com/kody-w/rapp-installer#start-here)
+<!-- rapp1:network-header:end -->
+
 **One Copilot chat. Talk to Brainstem or Brain Surgeon by name, with the same
 conversation, soul, memory, and capabilities. No agent-picker switching or
 Brainstem server required.**
