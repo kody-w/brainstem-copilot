@@ -1,3 +1,7 @@
+<!-- retired-notice:start -->
+> **Retired experiment, kept for reference.** The living project is [kody-w/rapp-installer](https://github.com/kody-w/rapp-installer).
+<!-- retired-notice:end -->
+
 # Brainstem Copilot
 
 <!-- rapp1:network-header:start -->
